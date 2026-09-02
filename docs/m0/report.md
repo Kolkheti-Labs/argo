@@ -8,7 +8,7 @@ https://github.com/logos-co/rfp/issues/170.
 
 | # | Deliverable | Where | Verified by |
 | --- | --- | --- | --- |
-| D1 | Repo, MIT + Apache-2.0, CI | `LICENSE-*`, `NOTICE`, `.github/workflows/` | CI run link: _pending push_ |
+| D1 | Repo, MIT + Apache-2.0, CI | `LICENSE-*`, `NOTICE`, `.github/workflows/` | green: https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127 |
 | D2 | SPEL scaffolding | `argo_core/`, `irm_core/`, `programs/argo_lending/`, `spikes/vault/` | guests build, `docs/m0/verification-log.md` |
 | D3 | Standalone-sequencer harness | `harness/` | smoke green on dev box and from a fresh toolchain (verification log) |
 | D4 | ring/riscv32 build | `docs/m0/riscv32-build.md` | guest ELFs built from a fresh toolchain home (verification log) |

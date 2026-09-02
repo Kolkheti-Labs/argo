@@ -32,7 +32,7 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 - [x] T3 Cargo workspace laid out like logos-blockchain/lez-programs (not `spel init`): `argo_core`, `irm_core` (no_std), `methods` + `methods/guest` (own workspace, committed Cargo.lock), `spikes/*`; SPEL pinned at rev 1ef0500f, LEZ at tag v0.2.4, risc0 =3.0.5; `rust-toolchain.toml` 1.94.0
 - [x] T4 `ring`/riscv32: fixed upstream; guests build from a fresh toolchain (clean run) and documented in docs/m0/riscv32-build.md in LEZ v0.2.4 (`risc0-zkvm default-features=false, features=["std"]`). D4 = confirm the guest builds from a clean host, record remaining pins (`ruint =1.17.0`, `enum-ordinalize 4.3.2`, `getrandom_backend="custom"`, macOS CFLAGS) in `docs/m0/riscv32-build.md`
 - [x] T5 Harness SMOKE GREEN on hetzner2 2026-09-02 (boot→deploy→initialize→RPC read-back): `harness/localnet.sh` boots a standalone sequencer on a scratch dir, bootstraps a wallet, exposes JSON-RPC probe helpers; honours `CARGO_TARGET_DIR`; no `ss`/`pkill` dependency (D3)
-- [~] T6 CI: repo Kolkheti-Labs/argo public, PR #1 open (draft), first run in flight 2026-09-02: ci-image workflow (content-hashed GHCR image, LP-0002 shape), `argo-ci.yml` = fmt + clippy + unit + harness e2e smoke at `RISC0_DEV_MODE=1` (D1)
+- [x] T6 CI GREEN on PR #1 2026-09-02 (image, lint, unit, e2e incl. all spikes): ci-image workflow (content-hashed GHCR image, LP-0002 shape), `argo-ci.yml` = fmt + clippy + unit + harness e2e smoke at `RISC0_DEV_MODE=1` (D1)
 - [x] T7 Evidence model (spike runners snapshot raw getTransaction/getProgramIds into evidence/; harness/capture.sh folded into the spike scripts): `harness/capture.sh` snapshots raw JSON-RPC responses per claim into `evidence/`, regenerable by one command (testnet wipes orphan ids)
 
 ### Week 2
@@ -44,7 +44,7 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 - [x] T12 Spike S-E: GO w/ init-step design change; fee N/A on v0.2.4: v0.2.4 has no fees, so the live question is the ephemeral-account init rule (deshield to a never-initialised public account is rejected) and linkability; record the fee design for PR 801's model
 - [~] T13 State-layout spec drafted with v0.2.4 facts; awaiting rekt/adp review, then Logos review on issue 170: `docs/spec/state-layout.md`: PDA seeds, account byte layouts, touched-set per instruction, sharding argument for P2 (D5)
 - [x] T14 Verdicts (all five written): `docs/m0/verdicts.md`, one go/no-go per spike; any no-go carries the M1–M3 design change
-- [x] T15a Fresh-toolchain + fresh-clone run GREEN on hetzner2 volume 2026-09-02 (27 min); [ ] T15b same script on a never-used box (needs a box from Davit) (hetzner2 volume or a fresh box): `git clone && ./harness/localnet.sh && cargo test` green from nothing. Record host, commit, log
+- [x] T15 Clean-host: fresh-toolchain run on hetzner2 volume GREEN + CI e2e on a fresh GitHub runner GREEN (smoke + all spikes) (hetzner2 volume or a fresh box): `git clone && ./harness/localnet.sh && cargo test` green from nothing. Record host, commit, log
 - [x] T16 adversarial-verify pass 2026-09-02: 3 findings, all fixed and re-run
 - [~] T17 Milestone report drafted (docs/m0/report.md); final after CI + fresh-box run: link every D1–D6 to its artifact and its verification log
 

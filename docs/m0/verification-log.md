@@ -62,6 +62,15 @@ B2  InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: CWU2Cn... })
    bootstrap with `HOME` redirected, and no longer swallows `rzup install`
    failures.
 
+## CI (GitHub Actions, ubuntu-latest, container from `.github/docker/ci.Dockerfile`)
+
+**GREEN 2026-09-02, PR #1, run https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127**: `ci-image` (10 min), `lint` (fmt +
+clippy under the lez-programs lint set), `unit` (pure crates + both riscv32
+guests + IDL drift check), `e2e-localnet` (sequencer and wallet installed from
+LEZ v0.2.4 source, harness smoke, then all five spike runners). This is the
+first run on a machine that had never built Argo, so it also stands as the
+clean-host evidence for the harness and spikes.
+
 ## Clean-environment run (interim, hetzner2 volume)
 
 Fresh `RUSTUP_HOME`/`CARGO_HOME`/`RISC0_HOME`/target under
