@@ -31,13 +31,34 @@ pub fn init(
     token_definition: AccountWithMetadata,
     self_program_id: ProgramId,
 ) -> Output {
-    assert_eq!(state.account, Account::default(), "state must be uninitialised");
-    assert_eq!(vault.account, Account::default(), "vault must be uninitialised");
-    assert_eq!(state.account_id, spike_vault_core::state_id(&self_program_id), "state id mismatch");
-    assert_eq!(vault.account_id, spike_vault_core::vault_id(&self_program_id), "vault id mismatch");
+    assert_eq!(
+        state.account,
+        Account::default(),
+        "state must be uninitialised"
+    );
+    assert_eq!(
+        vault.account,
+        Account::default(),
+        "vault must be uninitialised"
+    );
+    assert_eq!(
+        state.account_id,
+        spike_vault_core::state_id(&self_program_id),
+        "state id mismatch"
+    );
+    assert_eq!(
+        vault.account_id,
+        spike_vault_core::vault_id(&self_program_id),
+        "vault id mismatch"
+    );
     let token_program_id = token_definition.account.program_owner;
 
-    let st = VaultState { ops: 0, internal_hits: 0, vault: vault.account_id, pad: Vec::new() };
+    let st = VaultState {
+        ops: 0,
+        internal_hits: 0,
+        vault: vault.account_id,
+        pad: Vec::new(),
+    };
     let post_states = vec![
         AccountPostState::new_claimed(write_state(state.account, &st), Claim::Pda(STATE_SEED)),
         AccountPostState::new(vault.account.clone()),
@@ -77,7 +98,9 @@ pub fn pay_in(
     let transfer = ChainedCall::new(
         token_program_id,
         vec![user_holding, vault],
-        &token_core::Instruction::Transfer { amount_to_transfer: amount },
+        &token_core::Instruction::Transfer {
+            amount_to_transfer: amount,
+        },
     );
     (post_states, vec![transfer])
 }
@@ -114,7 +137,9 @@ pub fn pay_out(
     let transfer = ChainedCall::new(
         token_program_id,
         vec![vault_authorized, recipient],
-        &token_core::Instruction::Transfer { amount_to_transfer: amount },
+        &token_core::Instruction::Transfer {
+            amount_to_transfer: amount,
+        },
     )
     .with_pda_seeds(vec![seed]);
 
@@ -128,7 +153,9 @@ pub fn pay_out(
     let internal = ChainedCall::new(
         self_program_id,
         vec![state_for_internal],
-        &Instruction::Internal { must_fail: then_fail },
+        &Instruction::Internal {
+            must_fail: then_fail,
+        },
     );
 
     (post_states, vec![transfer, internal])
@@ -177,14 +204,20 @@ pub fn stress(state: AccountWithMetadata, iters: u32, pad: u32) -> Output {
         let a1 = argo_core::shares::to_assets_down(s1, ta, ts).unwrap_or(1);
         let u = irm_core::utilization(a1, ta).unwrap_or(0);
         let hv = argo_core::math::mul_div_down(a1, argo_core::WAD, u.wrapping_add(1)).unwrap_or(1);
-        let lif = argo_core::math::w_div_up(argo_core::WAD, hv.wrapping_add(argo_core::WAD)).unwrap_or(1);
+        let lif =
+            argo_core::math::w_div_up(argo_core::WAD, hv.wrapping_add(argo_core::WAD)).unwrap_or(1);
         acc = acc.wrapping_add(s1 ^ a1 ^ u ^ hv ^ lif) & (u128::MAX >> 8);
     }
     st.ops = st.ops.checked_add(1).expect("ops overflow");
     // Fold the accumulator into the pad so the loop is observable.
     let n = usize::try_from(pad).expect("pad fits usize");
-    st.pad = (0..n).map(|j| (acc.wrapping_add(j as u128) & 0xff) as u8).collect();
-    (vec![AccountPostState::new(write_state(state.account, &st))], vec![])
+    st.pad = (0..n)
+        .map(|j| (acc.wrapping_add(j as u128) & 0xff) as u8)
+        .collect();
+    (
+        vec![AccountPostState::new(write_state(state.account, &st))],
+        vec![],
+    )
 }
 
 /// `Internal`: reachable only from a chained self-call.
@@ -194,11 +227,17 @@ pub fn internal(
     caller_program_id: ProgramId,
     self_program_id: ProgramId,
 ) -> Output {
-    assert_eq!(caller_program_id, self_program_id, "Internal must be called by self");
+    assert_eq!(
+        caller_program_id, self_program_id,
+        "Internal must be called by self"
+    );
     assert!(!must_fail, "Internal asked to fail");
     let mut st = read_state(&state);
     st.internal_hits = st.internal_hits.checked_add(1).expect("hits overflow");
-    (vec![AccountPostState::new(write_state(state.account, &st))], vec![])
+    (
+        vec![AccountPostState::new(write_state(state.account, &st))],
+        vec![],
+    )
 }
 
 /// Decode the vault's fungible balance from a token holding account.

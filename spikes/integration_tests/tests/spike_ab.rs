@@ -2,7 +2,12 @@
 //! run against the in-process LEZ v0.2.4 state machine with the BUILTIN token
 //! program (the one the public testnet runs). Every test states which spike
 //! item it decides. `spikes/run.sh S-A|S-B` runs these and prints the verdict.
-#![allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, reason = "tests")]
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::indexing_slicing,
+    reason = "tests"
+)]
 
 use lee::{
     program_deployment_transaction, public_transaction, PrivateKey, ProgramDeploymentTransaction,
@@ -43,14 +48,20 @@ fn holding(balance: u128) -> Account {
     Account {
         program_owner: token_id(),
         balance: 0,
-        data: Data::from(&TokenHolding::Fungible { definition_id: definition_id(), balance }),
+        data: Data::from(&TokenHolding::Fungible {
+            definition_id: definition_id(),
+            balance,
+        }),
         nonce: Nonce(0),
     }
 }
 
 fn fresh_state() -> V03State {
     let mut st = V03State::new();
-    for elf in [programs::token().elf().to_vec(), spike_vault_methods::SPIKE_VAULT_ELF.to_vec()] {
+    for elf in [
+        programs::token().elf().to_vec(),
+        spike_vault_methods::SPIKE_VAULT_ELF.to_vec(),
+    ] {
         st.transition_from_program_deployment_transaction(&ProgramDeploymentTransaction::new(
             program_deployment_transaction::Message::new(elf),
         ))
@@ -102,7 +113,11 @@ fn init(st: &mut V03State) -> Result<(), lee::error::LeeError> {
     submit(
         st,
         spike_id(),
-        vec![state_id(&spike_id()), vault_id(&spike_id()), definition_id()],
+        vec![
+            state_id(&spike_id()),
+            vault_id(&spike_id()),
+            definition_id(),
+        ],
         &[],
         Instruction::Init,
     )
@@ -111,7 +126,11 @@ fn pay_in(st: &mut V03State, amount: u128) -> Result<(), lee::error::LeeError> {
     submit(
         st,
         spike_id(),
-        vec![state_id(&spike_id()), id_of(&user_key()), vault_id(&spike_id())],
+        vec![
+            state_id(&spike_id()),
+            id_of(&user_key()),
+            vault_id(&spike_id()),
+        ],
         &[&user_key()],
         Instruction::PayIn { amount },
     )
@@ -125,9 +144,17 @@ fn pay_out(
     submit(
         st,
         spike_id(),
-        vec![state_id(&spike_id()), vault_id(&spike_id()), id_of(&recipient_key())],
+        vec![
+            state_id(&spike_id()),
+            vault_id(&spike_id()),
+            id_of(&recipient_key()),
+        ],
         &[],
-        Instruction::PayOut { amount, then_fail, wrong_seed },
+        Instruction::PayOut {
+            amount,
+            then_fail,
+            wrong_seed,
+        },
     )
 }
 
@@ -145,8 +172,14 @@ fn funded_state() -> V03State {
 #[test]
 fn a1_b1_b3_happy_path_debit_by_seed_and_self_reentry() {
     let mut st = funded_state();
-    assert_eq!(st.get_account_by_id(vault_id(&spike_id())).program_owner, token_id());
-    assert_eq!(st.get_account_by_id(state_id(&spike_id())).program_owner, spike_id());
+    assert_eq!(
+        st.get_account_by_id(vault_id(&spike_id())).program_owner,
+        token_id()
+    );
+    assert_eq!(
+        st.get_account_by_id(state_id(&spike_id())).program_owner,
+        spike_id()
+    );
     assert_eq!(token_balance(&st, vault_id(&spike_id())), PAY_IN);
     assert_eq!(vault_state(&st).ops, 1);
 
@@ -163,11 +196,22 @@ fn a1_b1_b3_happy_path_debit_by_seed_and_self_reentry() {
 #[test]
 fn a2_late_leg_failure_reverts_everything() {
     let mut st = funded_state();
-    let before = (vault_state(&st), token_balance(&st, vault_id(&spike_id())), token_balance(&st, id_of(&recipient_key())));
+    let before = (
+        vault_state(&st),
+        token_balance(&st, vault_id(&spike_id())),
+        token_balance(&st, id_of(&recipient_key())),
+    );
     let err = pay_out(&mut st, PAY_OUT, true, false).expect_err("A2: chain must fail");
     eprintln!("A2 error surfaced to the executor: {err:?}");
-    assert!(format!("{err:?}").contains("Internal asked to fail"), "A2 must fail in the LAST leg, not earlier: {err:?}");
-    let after = (vault_state(&st), token_balance(&st, vault_id(&spike_id())), token_balance(&st, id_of(&recipient_key())));
+    assert!(
+        format!("{err:?}").contains("Internal asked to fail"),
+        "A2 must fail in the LAST leg, not earlier: {err:?}"
+    );
+    let after = (
+        vault_state(&st),
+        token_balance(&st, vault_id(&spike_id())),
+        token_balance(&st, id_of(&recipient_key())),
+    );
     assert_eq!(before, after, "A2: no partial commit");
 }
 
@@ -177,9 +221,18 @@ fn a2_late_leg_failure_reverts_everything() {
 fn a3_internal_is_rejected_at_top_level() {
     let mut st = funded_state();
     let before = vault_state(&st);
-    let err = submit(&mut st, spike_id(), vec![state_id(&spike_id())], &[], Instruction::Internal { must_fail: false })
-        .expect_err("A3: top-level call into an internal entrypoint must fail");
-    assert!(format!("{err:?}").contains("must be called by self"), "A3 must fail on the caller check: {err:?}");
+    let err = submit(
+        &mut st,
+        spike_id(),
+        vec![state_id(&spike_id())],
+        &[],
+        Instruction::Internal { must_fail: false },
+    )
+    .expect_err("A3: top-level call into an internal entrypoint must fail");
+    assert!(
+        format!("{err:?}").contains("must be called by self"),
+        "A3 must fail on the caller check: {err:?}"
+    );
     assert_eq!(vault_state(&st), before);
 }
 
@@ -190,7 +243,10 @@ fn a4_wrong_pda_seed_is_rejected() {
     let before = token_balance(&st, vault_id(&spike_id()));
     let err = pay_out(&mut st, PAY_OUT, false, true).expect_err("A4: wrong seed");
     eprintln!("A4 error: {err:?}");
-    assert!(format!("{err:?}").contains("InvalidAccountAuthorization"), "A4 must be the runtime's PDA-authorisation check: {err:?}");
+    assert!(
+        format!("{err:?}").contains("InvalidAccountAuthorization"),
+        "A4 must be the runtime's PDA-authorisation check: {err:?}"
+    );
     assert_eq!(token_balance(&st, vault_id(&spike_id())), before);
 }
 
@@ -205,11 +261,16 @@ fn a5_b4_forged_vault_debit_is_rejected() {
         token_id(),
         vec![vault_id(&spike_id()), id_of(&recipient_key())],
         &[&recipient_key()],
-        token_core::Instruction::Transfer { amount_to_transfer: PAY_OUT },
+        token_core::Instruction::Transfer {
+            amount_to_transfer: PAY_OUT,
+        },
     )
     .expect_err("A5: vault must not be debitable without PDA authority");
     eprintln!("A5 error: {err:?}");
-    assert!(format!("{err:?}").contains("Sender authorization is missing"), "A5 must fail on the token program's sender check: {err:?}");
+    assert!(
+        format!("{err:?}").contains("Sender authorization is missing"),
+        "A5 must fail on the token program's sender check: {err:?}"
+    );
     assert_eq!(token_balance(&st, vault_id(&spike_id())), before);
 }
 
@@ -217,14 +278,33 @@ fn a5_b4_forged_vault_debit_is_rejected() {
 #[test]
 fn a6_chain_length_limit_is_ten() {
     let mut st = funded_state();
-    submit(&mut st, spike_id(), vec![state_id(&spike_id())], &[], Instruction::Fanout { n: 10 })
-        .expect("A6: 10 chained calls fit");
+    submit(
+        &mut st,
+        spike_id(),
+        vec![state_id(&spike_id())],
+        &[],
+        Instruction::Fanout { n: 10 },
+    )
+    .expect("A6: 10 chained calls fit");
     assert_eq!(vault_state(&st).internal_hits, 10);
-    let err = submit(&mut st, spike_id(), vec![state_id(&spike_id())], &[], Instruction::Fanout { n: 11 })
-        .expect_err("A6: 11 chained calls exceed MAX_NUMBER_CHAINED_CALLS");
+    let err = submit(
+        &mut st,
+        spike_id(),
+        vec![state_id(&spike_id())],
+        &[],
+        Instruction::Fanout { n: 11 },
+    )
+    .expect_err("A6: 11 chained calls exceed MAX_NUMBER_CHAINED_CALLS");
     eprintln!("A6 error: {err:?}");
-    assert!(format!("{err:?}").contains("MaxChainedCallsDepthExceeded"), "A6 must be the depth limit: {err:?}");
-    assert_eq!(vault_state(&st).internal_hits, 10, "rejected chain applied nothing");
+    assert!(
+        format!("{err:?}").contains("MaxChainedCallsDepthExceeded"),
+        "A6 must be the depth limit: {err:?}"
+    );
+    assert_eq!(
+        vault_state(&st).internal_hits,
+        10,
+        "rejected chain applied nothing"
+    );
 }
 
 /// B2: crediting a never-initialised vault PDA by plain transfer is rejected
@@ -238,12 +318,21 @@ fn b2_credit_before_claim_is_rejected_then_init_succeeds() {
         token_id(),
         vec![id_of(&user_key()), vault_id(&spike_id())],
         &[&user_key()],
-        token_core::Instruction::Transfer { amount_to_transfer: PAY_IN },
+        token_core::Instruction::Transfer {
+            amount_to_transfer: PAY_IN,
+        },
     )
     .expect_err("B2: plain transfer into an unclaimed PDA must fail");
     eprintln!("B2 error: {err:?}");
-    assert!(format!("{err:?}").contains("ClaimedUnauthorizedAccount"), "B2 must be the unauthorised-claim rule: {err:?}");
-    assert_eq!(st.get_account_by_id(vault_id(&spike_id())), Account::default(), "PDA untouched");
+    assert!(
+        format!("{err:?}").contains("ClaimedUnauthorizedAccount"),
+        "B2 must be the unauthorised-claim rule: {err:?}"
+    );
+    assert_eq!(
+        st.get_account_by_id(vault_id(&spike_id())),
+        Account::default(),
+        "PDA untouched"
+    );
     init(&mut st).expect("B2: Init after the failed credit still claims the vault");
     pay_in(&mut st, PAY_IN).expect("B2: credit after claim succeeds");
     assert_eq!(token_balance(&st, vault_id(&spike_id())), PAY_IN);
@@ -255,10 +344,19 @@ fn b2_credit_before_claim_is_rejected_then_init_succeeds() {
 #[test]
 fn b5_builtin_token_matches_testnet_capture() {
     let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../../evidence/testnet");
-    let mut files: Vec<_> = std::fs::read_dir(dir).expect("evidence/testnet exists").flatten().map(|e| e.path()).filter(|p| p.to_string_lossy().contains("getProgramIds")).collect();
+    let mut files: Vec<_> = std::fs::read_dir(dir)
+        .expect("evidence/testnet exists")
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.to_string_lossy().contains("getProgramIds"))
+        .collect();
     files.sort();
     let latest = files.last().expect("a getProgramIds capture");
     let text = std::fs::read_to_string(latest).unwrap();
     let expected = format!("\"token\":{:?}", token_id().to_vec()).replace(' ', "");
-    assert!(text.replace(' ', "").contains(&expected), "testnet token id differs from the builtin used here.\nbuiltin: {:?}\ncapture: {latest:?}", token_id());
+    assert!(
+        text.replace(' ', "").contains(&expected),
+        "testnet token id differs from the builtin used here.\nbuiltin: {:?}\ncapture: {latest:?}",
+        token_id()
+    );
 }

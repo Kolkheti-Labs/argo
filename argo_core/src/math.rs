@@ -20,7 +20,11 @@ pub fn mul_div_up(x: u128, y: u128, d: u128) -> Option<u128> {
     // remainder = (x*y) - q*d, computed in 256 bits to avoid overflow
     let (qh, ql) = widening_mul(q, d);
     let exact = qh == hi && ql == lo;
-    if exact { Some(q) } else { q.checked_add(1) }
+    if exact {
+        Some(q)
+    } else {
+        q.checked_add(1)
+    }
 }
 
 /// `x * y / WAD`, rounding down.

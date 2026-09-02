@@ -55,6 +55,11 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 - Ephemeral account: SDK must init the account with its own key before the deshield (E0). Extra public tx per private op.
 - Compute: design liquidation for BOTH per-leg 32M (v0.2.4) and chain-total budget (fee PR 801).
 
+## Deferred to M1 (recorded, not hidden)
+
+- `cargo deny` licence/advisory gate with a reviewed `deny.toml` (dropped from the M0 workflow: no config yet, would fail for the wrong reason).
+- CI caching of the LEZ sequencer/wallet install (every run rebuilds ~25 min).
+
 ## Blocked / needs Davit
 
 - Contract signature confirmation (Gate 0)

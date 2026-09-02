@@ -11,7 +11,9 @@ use wallet::WalletCore;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let pid_hex = std::env::args().nth(1).ok_or_else(|| anyhow::anyhow!("usage: argo_initialize <program-id-hex>"))?;
+    let pid_hex = std::env::args()
+        .nth(1)
+        .ok_or_else(|| anyhow::anyhow!("usage: argo_initialize <program-id-hex>"))?;
     let program_id = harness_runner::parse_program_id(&pid_hex)?;
     let wallet = WalletCore::from_env().await?;
 

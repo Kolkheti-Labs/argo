@@ -19,7 +19,11 @@ pub enum Instruction {
     /// recipient, then a chained self-call `Internal { must_fail }`.
     /// `wrong_seed` authorises the debit with a seed that derives no account
     /// (negative test A4).
-    PayOut { amount: u128, then_fail: bool, wrong_seed: bool },
+    PayOut {
+        amount: u128,
+        then_fail: bool,
+        wrong_seed: bool,
+    },
     /// Chain `n` self-calls to `Internal { must_fail: false }` (chain-length
     /// test A6; the runtime allows at most 10 chained executions).
     Fanout { n: u32 },

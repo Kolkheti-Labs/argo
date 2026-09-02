@@ -10,8 +10,11 @@ use wallet::WalletCore;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let name = std::env::args().nth(1).ok_or_else(|| anyhow::anyhow!("usage: argo_deploy <guest>"))?;
-    let guest = harness_runner::guest(&name).ok_or_else(|| anyhow::anyhow!("unknown guest {name}"))?;
+    let name = std::env::args()
+        .nth(1)
+        .ok_or_else(|| anyhow::anyhow!("usage: argo_deploy <guest>"))?;
+    let guest =
+        harness_runner::guest(&name).ok_or_else(|| anyhow::anyhow!("unknown guest {name}"))?;
     let wallet = WalletCore::from_env().await?;
 
     let tx = ProgramDeploymentTransaction::new(Message::new(guest.elf.to_vec()));
@@ -22,7 +25,10 @@ async fn main() -> anyhow::Result<()> {
         .map_err(|e| anyhow::anyhow!("send_transaction failed: {e}"))?;
 
     println!("GUEST={}", guest.name);
-    println!("PROGRAM_ID={}", harness_runner::format_program_id(&guest.id));
+    println!(
+        "PROGRAM_ID={}",
+        harness_runner::format_program_id(&guest.id)
+    );
     println!("TX={tx_hash}");
     Ok(())
 }
