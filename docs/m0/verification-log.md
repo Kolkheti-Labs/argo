@@ -70,4 +70,19 @@ steps via `harness/clean-host.sh`. Same kernel and apt packages as the dev
 box, so this is not the final clean-host run; that needs a box that never
 built Argo.
 
-(result pending)
+**GREEN, 2026-09-02T19:18:46Z at commit e06df05** (`harness/clean-host.sh`,
+27 min wall clock from empty toolchain homes on 8 vCPU). Steps and outcomes:
+
+| Step | Outcome |
+| --- | --- |
+| rustup (1.94.0 via `rust-toolchain.toml`), rzup rust 1.94.1 / cpp 2024.1.5 / r0vm 3.0.5 / cargo-risczero 3.0.5 | installed into `argo-clean/{rustup,cargo,risc0}` |
+| `git clone -b main <bundle>` | HEAD e06df05 |
+| `cargo test -p argo_core -p irm_core` | 7 passed |
+| `./harness/localnet.sh smoke` | sequencer + wallet built from source, `argo_lending` deployed as `d9b7db26…`, Config PDA initialised and read back: GREEN |
+| `spikes/run.sh all` | S-A GO (6 tests), S-B GO (4 tests incl. b5 token-id match), S-D GO (heaviest leg 271,395 cycles; 50 KB account 23.68M), S-C NO-GO (8.44 ms/getAccount), S-E landed end to end (E0b rejected at prover) |
+
+Cycle counts differ from the dev-box run by <0.5% (different guest image
+from a different toolchain home), which is the expected noise.
+
+Still not the final clean host: same kernel and apt packages as the dev box.
+The acceptance gate's last row needs one run on a box that never built Argo.

@@ -9,8 +9,8 @@ invoice and links every claim to an artifact in this repository.
 | --- | --- | --- | --- |
 | D1 | Repo, MIT + Apache-2.0, CI | `LICENSE-*`, `NOTICE`, `.github/workflows/` | CI run link: _pending push_ |
 | D2 | SPEL scaffolding | `argo_core/`, `irm_core/`, `programs/argo_lending/`, `spikes/vault/` | guests build, `docs/m0/verification-log.md` |
-| D3 | Standalone-sequencer harness | `harness/` | smoke green, verification log |
-| D4 | ring/riscv32 build | `docs/m0/riscv32-build.md` | guest ELFs built on Linux x86_64 |
+| D3 | Standalone-sequencer harness | `harness/` | smoke green on dev box and from a fresh toolchain (verification log) |
+| D4 | ring/riscv32 build | `docs/m0/riscv32-build.md` | guest ELFs built from a fresh toolchain home (verification log) |
 | D5 | Sharding + state-layout spec | `docs/spec/state-layout.md` | review by rekt, adp: _pending_ |
 | D6 | Go/no-go spikes | `docs/m0/verdicts.md`, `spikes/` | S-A GO, S-B GO, S-C NO-GO (polling), S-D GO, S-E GO with init-step change |
 
