@@ -7,6 +7,7 @@
 set -uo pipefail
 R="$(cd "$(dirname "$0")/../.." && pwd)"
 EV="$R/evidence/localnet"; mkdir -p "$EV"
+export RISC0_BUILD_LOCKED=1
 export RISC0_DEV_MODE="${RISC0_DEV_MODE:-1}"
 cargo test --locked --release -p spike_integration_tests --test spike_ab -- a1_b1 a5_b4 b2_ b5_ --nocapture 2>&1 | tee "$R/.spike-S-B.log"
 rc=${PIPESTATUS[0]}

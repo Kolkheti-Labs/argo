@@ -21,6 +21,7 @@ export ARGO_RPC="http://127.0.0.1:$ARGO_PORT"
 TARGET="${CARGO_TARGET_DIR:-$R/target}"
 BIN="$TARGET/lez-bin"                 # cargo install --root for the LEZ binaries
 export RISC0_DEV_MODE="${RISC0_DEV_MODE:-1}"
+export RISC0_BUILD_LOCKED=1   # guest image ids are a function of the committed lockfiles
 export LEE_WALLET_HOME_DIR="$D/wallet"
 LEZ_GIT="https://github.com/logos-blockchain/logos-execution-zone.git"
 LEZ_TAG="v0.2.4"

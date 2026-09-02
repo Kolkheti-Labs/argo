@@ -4,6 +4,7 @@
 set -uo pipefail
 R="$(cd "$(dirname "$0")/../.." && pwd)"
 EV="$R/evidence/localnet"; mkdir -p "$EV"
+export RISC0_BUILD_LOCKED=1
 cargo test --locked --release -p spike_integration_tests --test spike_d -- --nocapture 2>&1 | tee "$R/.spike-S-D.log"
 rc=${PIPESTATUS[0]}
 # The cycle table is deterministic for a given guest image + lockfiles, so it is committed as evidence.

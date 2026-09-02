@@ -14,6 +14,7 @@ export RUSTUP_HOME="$W/rustup" CARGO_HOME="$W/cargo" RISC0_HOME="$W/risc0"
 export PATH="$CARGO_HOME/bin:$RISC0_HOME/bin:$PATH"
 export CARGO_TARGET_DIR="$W/target" TMPDIR="$W/tmp"; mkdir -p "$TMPDIR"
 export RISC0_DEV_MODE=1
+export RISC0_BUILD_LOCKED=1   # guest builds must use the committed guest Cargo.lock
 echo "== toolchains into $W (rust from rust-toolchain.toml, risc0 3.0.5) =="
 [ -x "$CARGO_HOME/bin/cargo" ] || curl -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain none >/dev/null
 # The rzup bootstrap script ignores RISC0_HOME and always writes $HOME/.risc0/bin/rzup,
