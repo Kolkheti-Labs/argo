@@ -212,7 +212,7 @@ pub fn stress(state: AccountWithMetadata, iters: u32, pad: u32) -> Output {
     // Fold the accumulator into the pad so the loop is observable.
     let n = usize::try_from(pad).expect("pad fits usize");
     st.pad = (0..n)
-        .map(|j| (acc.wrapping_add(j as u128) & 0xff) as u8)
+        .map(|j| u8::try_from(acc.wrapping_add(u128::try_from(j).unwrap_or(0)) & 0xff).unwrap_or(0))
         .collect();
     (
         vec![AccountPostState::new(write_state(state.account, &st))],
@@ -245,6 +245,6 @@ pub fn internal(
 pub fn holding_balance(account: &Account) -> Option<u128> {
     match TokenHolding::try_from(&account.data).ok()? {
         TokenHolding::Fungible { balance, .. } => Some(balance),
-        _ => None,
+        TokenHolding::NftMaster { .. } | TokenHolding::NftPrintedCopy { .. } => None,
     }
 }

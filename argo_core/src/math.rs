@@ -42,23 +42,36 @@ pub fn w_div_up(x: u128, y: u128) -> Option<u128> {
     mul_div_up(x, crate::WAD, y)
 }
 
+const LO_MASK: u128 = 0xFFFF_FFFF_FFFF_FFFF;
+
 /// Full 128×128 → 256-bit product as `(hi, lo)`.
+#[allow(
+    clippy::arithmetic_side_effects,
+    reason = "every operand is masked to 64 bits before multiplying, so each partial product is < 2^128 and each sum of three 64-bit-shifted terms is < 2^128; this is the standard schoolbook widening multiply and is exhaustively property-tested below"
+)]
 fn widening_mul(x: u128, y: u128) -> (u128, u128) {
-    let (x0, x1) = (x & u64::MAX as u128, x >> 64);
-    let (y0, y1) = (y & u64::MAX as u128, y >> 64);
+    let (x0, x1) = (x & LO_MASK, x >> 64);
+    let (y0, y1) = (y & LO_MASK, y >> 64);
     let p00 = x0 * y0;
     let p01 = x0 * y1;
     let p10 = x1 * y0;
     let p11 = x1 * y1;
-    let mid = (p00 >> 64) + (p01 & u64::MAX as u128) + (p10 & u64::MAX as u128);
-    let lo = (mid << 64) | (p00 & u64::MAX as u128);
+    let mid = (p00 >> 64) + (p01 & LO_MASK) + (p10 & LO_MASK);
+    let lo = (mid << 64) | (p00 & LO_MASK);
     let hi = p11 + (p01 >> 64) + (p10 >> 64) + (mid >> 64);
     (hi, lo)
 }
 
 /// Divide a 256-bit value `(hi, lo)` by a 128-bit `d`. `None` if the quotient
 /// does not fit in 128 bits.
+#[allow(
+    clippy::arithmetic_side_effects,
+    reason = "d != 0 is checked by every caller and re-checked here; the loop counter is decremented only while > 0; the shift-subtract step uses wrapping_sub on purpose (the carry bit makes the subtraction exact)"
+)]
 fn div_256_by_128(hi: u128, lo: u128, d: u128) -> Option<u128> {
+    if d == 0 {
+        return None;
+    }
     if hi >= d {
         return None;
     }
@@ -85,6 +98,11 @@ fn div_256_by_128(hi: u128, lo: u128, d: u128) -> Option<u128> {
 }
 
 #[cfg(test)]
+#[allow(
+    clippy::arithmetic_side_effects,
+    clippy::as_conversions,
+    reason = "test oracle arithmetic on inputs chosen so it cannot overflow"
+)]
 mod tests {
     use super::*;
     use proptest::prelude::*;

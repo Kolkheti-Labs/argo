@@ -29,6 +29,10 @@ pub fn utilization(total_borrow_assets: u128, total_supply_assets: u128) -> Opti
 }
 
 #[cfg(test)]
+#[allow(
+    clippy::assertions_on_constants,
+    reason = "the point is to pin the constant ordering"
+)]
 mod tests {
     use super::*;
 

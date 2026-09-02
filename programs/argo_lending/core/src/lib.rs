@@ -27,6 +27,11 @@ pub struct Config {
     pub enabled_irm: Vec<ProgramId>,
 }
 
+#[allow(
+    clippy::indexing_slicing,
+    clippy::arithmetic_side_effects,
+    reason = "i < s.len() && i < 32 is the loop condition, so both indexes and the increment are in bounds"
+)]
 const fn padded(s: &[u8]) -> [u8; 32] {
     let mut out = [0u8; 32];
     let mut i = 0;
