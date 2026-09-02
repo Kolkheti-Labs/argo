@@ -1,0 +1,35 @@
+[package]
+name = "harness_runner"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Host-side runners the harness and spikes drive: deploy a guest, submit public txs, read state"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "argo_deploy"
+path = "src/bin/argo_deploy.rs"
+
+[[bin]]
+name = "argo_initialize"
+path = "src/bin/argo_initialize.rs"
+
+[[bin]]
+name = "argo_setup_funder"
+path = "src/bin/argo_setup_funder.rs"
+
+[dependencies]
+testnet_initial_state.workspace = true
+lee.workspace = true
+lee_core.workspace = true
+lez_common.workspace = true
+wallet.workspace = true
+sequencer_service_rpc.workspace = true
+argo_lending_core.workspace = true
+argo_lending_methods = { path = "../../programs/argo_lending/methods" }
+spike_vault_methods = { path = "../../spikes/vault/methods" }
+tokio.workspace = true
+anyhow.workspace = true
+hex.workspace = true

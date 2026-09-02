@@ -1,0 +1,85 @@
+name: Argo CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+  packages: read
+
+concurrency:
+  group: argo-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Build once, reuse: the same Rust + risc0 + system-deps image LEZ CI runs in.
+  ci-image:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/ci-image.yml
+
+  lint:
+    needs: ci-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: ${{ needs.ci-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: fmt
+        run: cargo +nightly fmt --all -- --check
+      - name: clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: licences and advisories
+        run: cargo deny check licenses advisories
+
+  unit:
+    needs: ci-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: ${{ needs.ci-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      RISC0_DEV_MODE: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - name: pure crates (host)
+        run: cargo nextest run -p argo_core -p irm_core
+      - name: guest builds for riscv32
+        run: cargo build --release -p methods
+
+  # Full loop against a locally booted STANDALONE sequencer. Never touches the
+  # public testnet. RISC0_DEV_MODE=1 so CI finishes in minutes; real proofs are
+  # a separate, documented run.
+  e2e-localnet:
+    needs: ci-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container:
+      image: ${{ needs.ci-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      RISC0_DEV_MODE: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - name: harness smoke (boot sequencer, deploy placeholder, read back)
+        run: ./harness/localnet.sh smoke
+      - name: spikes (all five, verdict outputs)
+        run: ./spikes/run.sh all
+      - name: sequencer log (on failure)
+        if: failure()
+        shell: bash
+        run: tail -150 .localnet-argo/seq.log 2>/dev/null || true
