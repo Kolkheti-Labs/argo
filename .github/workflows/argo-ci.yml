@@ -86,8 +86,11 @@ jobs:
         run: ./harness/localnet.sh smoke
       - name: spikes (all five; a spike that fails to run or whose decisive tests fail exits non-zero)
         run: ./spikes/run.sh all
-      - name: committed spike captures (test lists, cycle table) are byte-identical to this run
-        run: git diff --exit-code -- evidence/localnet/S-A.run.txt evidence/localnet/S-B.run.txt evidence/localnet/S-D.run.txt
+      - name: committed spike captures match this run (test lists byte-identical; cycle table within 0.5%, see docs/m0/riscv32-build.md)
+        run: |
+          git diff --exit-code -- evidence/localnet/S-A.run.txt evidence/localnet/S-B.run.txt
+          git show HEAD:evidence/localnet/S-D.run.txt > /tmp/S-D.committed.txt
+          python3 harness/compare-cycles.py /tmp/S-D.committed.txt evidence/localnet/S-D.run.txt
       - name: sequencer log (on failure)
         if: failure()
         shell: bash

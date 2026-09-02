@@ -36,11 +36,23 @@ the fix. No `[patch]` section is needed.
    from M1 on.
 
 Only path 1 was run in M0 (its image ids are in the verification log). Path 2
-is the deployment path from M1 on, where its id will be compared against
-path 1's. Both guest workspaces commit their `Cargo.lock` and CI sets
-`RISC0_BUILD_LOCKED=1`, so path 1's image id is a function of the committed
-tree; `enum-ordinalize` resolves to 4.4.2 there and builds fine on the 1.94.1
-guest toolchain (the 4.3.2 pin `spel init` applies was not needed).
+is the deployment path from M1 on.
+
+**Finding (M0): path 1's image id depends on the checkout directory.** Both
+guest workspaces commit their `Cargo.lock` and every build sets
+`RISC0_BUILD_LOCKED=1`, yet the same commit built at `/mnt/.../argo` and at
+`/mnt/.../argo-clean/argo` produced different image ids. `strings` on the two
+ELFs shows the only difference: the absolute path of `spikes/vault/src/lib.rs`
+embedded in panic-location strings. Cargo passes absolute source paths to
+rustc, risc0-build fixes the guest `RUSTFLAGS` itself and only accepts a
+static `rustc-flags` list, so `--remap-path-prefix` cannot be applied to an
+unknown checkout path. Consequences: (a) the S-D cycle table drifts by a
+few hundred cycles between hosts (0.24% observed), so CI compares it with a
+0.5% tolerance (`harness/compare-cycles.py`) instead of byte-for-byte; (b) a
+deployable, reproducible image id needs path 2, the Docker builder that
+mounts the tree at a fixed path, which M1 adopts before any deployment.
+`enum-ordinalize` resolves to 4.4.2 and builds fine on the 1.94.1 guest
+toolchain (the 4.3.2 pin `spel init` applies was not needed).
 
 ## Verification
 

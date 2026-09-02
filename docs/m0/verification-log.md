@@ -77,6 +77,17 @@ funder that signed `Initialize`; `./spikes/run.sh all` exit 0 with verdicts
 S-A GO, S-B GO, S-D GO (asserted), S-C NO-GO, S-E PARTIAL; 26 evidence files
 regenerated. The image ids above are from this build.
 
+## Clean-environment run at the fix-round head (2026-09-02T22:17Z, commit 6ad392e)
+
+`harness/clean-host.sh <bundle> <empty dir> 6ad392e5d9d2ce2700b829ce72a161ca7c0833aa`
+from empty toolchain homes on hetzner2, 25 min: pure tests 7 passed; harness
+smoke green with `Config.admin` equal to the signer; `spikes/run.sh all`
+exit 0 with S-A GO, S-B GO, S-D GO, S-C NO-GO, S-E PARTIAL. Guest image ids
+from this run differ from the dev-box ids above (`ARGO_LENDING_ID =
+[2634457274, …]`, `SPIKE_VAULT_ID = [606894471, …]`) and the S-D heaviest leg
+was 271,275 vs 270,633 cycles: the checkout-path dependence documented in
+`docs/m0/riscv32-build.md`, found by this run.
+
 ## CI (GitHub Actions, ubuntu-latest, container from `.github/docker/ci.Dockerfile`)
 
 **GREEN 2026-09-02, PR #1, run https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127**: `ci-image` (10 min), `lint` (fmt +
