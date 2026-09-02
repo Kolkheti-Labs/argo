@@ -1,8 +1,7 @@
-test b5_builtin_token_matches_testnet_capture ... ok
-B2 error: InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: DgUeHqYNwAekQCLnHS8x8vBKjaCXyJnLNXvyNMisen4 })
-thread 'main' (1) panicked at lez/programs/token/src/transfer.rs:13:5:
 A5 error: ProgramExecutionFailed("Guest panicked: Sender authorization is missing")
+B2 error: InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: DgUeHqYNwAekQCLnHS8x8vBKjaCXyJnLNXvyNMisen4 })
+test a1_b1_b3_happy_path_debit_by_seed_and_self_reentry ... ok
 test a5_b4_forged_vault_debit_is_rejected ... ok
 test b2_credit_before_claim_is_rejected_then_init_succeeds ... ok
-test a1_b1_b3_happy_path_debit_by_seed_and_self_reentry ... ok
+test b5_builtin_token_matches_testnet_capture ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out;

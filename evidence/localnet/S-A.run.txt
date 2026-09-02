@@ -1,14 +1,11 @@
-thread '<unnamed>' (1) panicked at /mnt/HC_Volume_105321168/argo/spikes/vault/src/lib.rs:230:5:
-test a3_internal_is_rejected_at_top_level ... ok
-thread 'main' (1) panicked at lez/programs/token/src/transfer.rs:13:5:
-A5 error: ProgramExecutionFailed("Guest panicked: Sender authorization is missing")
-test a5_b4_forged_vault_debit_is_rejected ... ok
-thread '<unnamed>' (1) panicked at /mnt/HC_Volume_105321168/argo/spikes/vault/src/lib.rs:234:5:
 A2 error surfaced to the executor: ProgramExecutionFailed("Guest panicked: Internal asked to fail")
-test a2_late_leg_failure_reverts_everything ... ok
 A4 error: InvalidProgramBehavior(InvalidAccountAuthorization { account_id: DgUeHqYNwAekQCLnHS8x8vBKjaCXyJnLNXvyNMisen4 })
-test a4_wrong_pda_seed_is_rejected ... ok
-test a1_b1_b3_happy_path_debit_by_seed_and_self_reentry ... ok
+A5 error: ProgramExecutionFailed("Guest panicked: Sender authorization is missing")
 A6 error: MaxChainedCallsDepthExceeded
+test a1_b1_b3_happy_path_debit_by_seed_and_self_reentry ... ok
+test a2_late_leg_failure_reverts_everything ... ok
+test a3_internal_is_rejected_at_top_level ... ok
+test a4_wrong_pda_seed_is_rejected ... ok
+test a5_b4_forged_vault_debit_is_rejected ... ok
 test a6_chain_length_limit_is_ten ... ok
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out;

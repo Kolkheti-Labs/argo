@@ -86,8 +86,8 @@ jobs:
         run: ./harness/localnet.sh smoke
       - name: spikes (all five; a spike that fails to run or whose decisive tests fail exits non-zero)
         run: ./spikes/run.sh all
-      - name: spike outputs captured as evidence match what is committed (cycle table, test lists)
-        run: git status --porcelain evidence/ && git diff --stat -- evidence/localnet/S-A.run.txt evidence/localnet/S-B.run.txt evidence/localnet/S-D.run.txt
+      - name: committed spike captures (test lists, cycle table) are byte-identical to this run
+        run: git diff --exit-code -- evidence/localnet/S-A.run.txt evidence/localnet/S-B.run.txt evidence/localnet/S-D.run.txt
       - name: sequencer log (on failure)
         if: failure()
         shell: bash

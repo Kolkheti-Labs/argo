@@ -10,7 +10,7 @@ EV="$R/evidence/localnet"; mkdir -p "$EV"
 export RISC0_DEV_MODE="${RISC0_DEV_MODE:-1}"
 cargo test --locked --release -p spike_integration_tests --test spike_ab -- a1_b1 a5_b4 b2_ b5_ --nocapture 2>&1 | tee "$R/.spike-S-B.log"
 rc=${PIPESTATUS[0]}
-grep -E "^test |^test result|^B[0-9] error|^A5 error|panicked at" "$R/.spike-S-B.log" | sed -E 's/ finished in [0-9.]+s//' > "$EV/S-B.run.txt"
+grep -E "^test |^test result|^B[0-9] error|^A5 error" "$R/.spike-S-B.log" | sed -E 's/ finished in [0-9.]+s//' | sort > "$EV/S-B.run.txt"
 if [ "$rc" -eq 0 ]; then
   echo "VERDICT S-B: GO -- anyone credits a claimed vault; only the program debits it (by seed); credit before claim is rejected (ClaimedUnauthorizedAccount) so create_market claims first; builtin token id == testnet capture"
 else
