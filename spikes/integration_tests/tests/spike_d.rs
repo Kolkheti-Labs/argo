@@ -26,6 +26,7 @@ fn definition_id() -> AccountId {
     AccountId::new([5; 32])
 }
 
+#[derive(Debug)]
 struct Run {
     /// Sum of segment cycles (po2-padded, what proving time scales with).
     padded: u64,
@@ -111,6 +112,11 @@ fn s_d_cycle_table() {
         }
     }
     eprintln!("{:<44} {per_iter:>12.0} cycles/iter", "D2b marginal cost per math iteration");
+    // D2c: the runtime's per-execution limit is real and is the padded metric.
+    let over = try_execute(elf, spike_id(), None, vec![state_account(1, 0)], Instruction::Stress { iters: 10_000, pad: 0 })
+        .expect_err("D2c: 10k iterations (~52M padded cycles) must exceed the 32M session limit");
+    assert!(over.contains("Session limit exceeded"), "D2c: expected the executor's session-limit error, got: {over}");
+    eprintln!("{:<44} rejected: {over}", "D2c Stress iters=10000");
 
     // D3 account-size sweep: pre-state carries `pad` bytes; post-state keeps them.
     let mut last = base.padded;
