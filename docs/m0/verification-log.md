@@ -54,6 +54,20 @@ A6  MaxChainedCallsDepthExceeded                                      (11 calls;
 B2  InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: CWU2Cn... })
 ```
 
-## Clean-host run
+4. First clean-environment attempt (fresh toolchain homes + fresh clone on
+   hetzner2's volume) failed in 4 s: the git bundle carried no HEAD, so
+   `git clone` checked out nothing; and the rzup bootstrap ignores
+   `RISC0_HOME`, writing to `$HOME/.risc0` (the CI Dockerfile works around
+   the same thing). `harness/clean-host.sh` now clones `-b main`, runs the
+   bootstrap with `HOME` redirected, and no longer swallows `rzup install`
+   failures.
 
-(pending: fresh clone on a host that has never built Argo, following README only)
+## Clean-environment run (interim, hetzner2 volume)
+
+Fresh `RUSTUP_HOME`/`CARGO_HOME`/`RISC0_HOME`/target under
+`/mnt/HC_Volume_105321168/argo-clean`, fresh clone from a bundle, README
+steps via `harness/clean-host.sh`. Same kernel and apt packages as the dev
+box, so this is not the final clean-host run; that needs a box that never
+built Argo.
+
+(result pending)

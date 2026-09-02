@@ -166,6 +166,7 @@ fn a2_late_leg_failure_reverts_everything() {
     let before = (vault_state(&st), token_balance(&st, vault_id(&spike_id())), token_balance(&st, id_of(&recipient_key())));
     let err = pay_out(&mut st, PAY_OUT, true, false).expect_err("A2: chain must fail");
     eprintln!("A2 error surfaced to the executor: {err:?}");
+    assert!(format!("{err:?}").contains("Internal asked to fail"), "A2 must fail in the LAST leg, not earlier: {err:?}");
     let after = (vault_state(&st), token_balance(&st, vault_id(&spike_id())), token_balance(&st, id_of(&recipient_key())));
     assert_eq!(before, after, "A2: no partial commit");
 }
@@ -176,8 +177,9 @@ fn a2_late_leg_failure_reverts_everything() {
 fn a3_internal_is_rejected_at_top_level() {
     let mut st = funded_state();
     let before = vault_state(&st);
-    submit(&mut st, spike_id(), vec![state_id(&spike_id())], &[], Instruction::Internal { must_fail: false })
+    let err = submit(&mut st, spike_id(), vec![state_id(&spike_id())], &[], Instruction::Internal { must_fail: false })
         .expect_err("A3: top-level call into an internal entrypoint must fail");
+    assert!(format!("{err:?}").contains("must be called by self"), "A3 must fail on the caller check: {err:?}");
     assert_eq!(vault_state(&st), before);
 }
 
@@ -188,6 +190,7 @@ fn a4_wrong_pda_seed_is_rejected() {
     let before = token_balance(&st, vault_id(&spike_id()));
     let err = pay_out(&mut st, PAY_OUT, false, true).expect_err("A4: wrong seed");
     eprintln!("A4 error: {err:?}");
+    assert!(format!("{err:?}").contains("InvalidAccountAuthorization"), "A4 must be the runtime's PDA-authorisation check: {err:?}");
     assert_eq!(token_balance(&st, vault_id(&spike_id())), before);
 }
 
@@ -206,6 +209,7 @@ fn a5_b4_forged_vault_debit_is_rejected() {
     )
     .expect_err("A5: vault must not be debitable without PDA authority");
     eprintln!("A5 error: {err:?}");
+    assert!(format!("{err:?}").contains("Sender authorization is missing"), "A5 must fail on the token program's sender check: {err:?}");
     assert_eq!(token_balance(&st, vault_id(&spike_id())), before);
 }
 
@@ -219,6 +223,7 @@ fn a6_chain_length_limit_is_ten() {
     let err = submit(&mut st, spike_id(), vec![state_id(&spike_id())], &[], Instruction::Fanout { n: 11 })
         .expect_err("A6: 11 chained calls exceed MAX_NUMBER_CHAINED_CALLS");
     eprintln!("A6 error: {err:?}");
+    assert!(format!("{err:?}").contains("MaxChainedCallsDepthExceeded"), "A6 must be the depth limit: {err:?}");
     assert_eq!(vault_state(&st).internal_hits, 10, "rejected chain applied nothing");
 }
 
@@ -237,8 +242,23 @@ fn b2_credit_before_claim_is_rejected_then_init_succeeds() {
     )
     .expect_err("B2: plain transfer into an unclaimed PDA must fail");
     eprintln!("B2 error: {err:?}");
+    assert!(format!("{err:?}").contains("ClaimedUnauthorizedAccount"), "B2 must be the unauthorised-claim rule: {err:?}");
     assert_eq!(st.get_account_by_id(vault_id(&spike_id())), Account::default(), "PDA untouched");
     init(&mut st).expect("B2: Init after the failed credit still claims the vault");
     pay_in(&mut st, PAY_IN).expect("B2: credit after claim succeeds");
     assert_eq!(token_balance(&st, vault_id(&spike_id())), PAY_IN);
+}
+
+/// B5: the token program these tests run against must be the one the public
+/// testnet registers, otherwise the custody verdict is about the wrong program.
+/// Compares the builtin image id with the captured `getProgramIds` evidence.
+#[test]
+fn b5_builtin_token_matches_testnet_capture() {
+    let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../../evidence/testnet");
+    let mut files: Vec<_> = std::fs::read_dir(dir).expect("evidence/testnet exists").flatten().map(|e| e.path()).filter(|p| p.to_string_lossy().contains("getProgramIds")).collect();
+    files.sort();
+    let latest = files.last().expect("a getProgramIds capture");
+    let text = std::fs::read_to_string(latest).unwrap();
+    let expected = format!("\"token\":{:?}", token_id().to_vec()).replace(' ', "");
+    assert!(text.replace(' ', "").contains(&expected), "testnet token id differs from the builtin used here.\nbuiltin: {:?}\ncapture: {latest:?}", token_id());
 }
