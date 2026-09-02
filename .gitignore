@@ -1,0 +1,10 @@
+/target
+**/target
+.localnet-*/
+.testnet-*/
+*.log
+storage.json
+*.jwk
+wallet_home/
+.env
+.DS_Store
