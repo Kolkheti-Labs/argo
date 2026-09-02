@@ -32,7 +32,7 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 - [x] T3 Cargo workspace laid out like logos-blockchain/lez-programs (not `spel init`): `argo_core`, `irm_core` (no_std), `methods` + `methods/guest` (own workspace, committed Cargo.lock), `spikes/*`; SPEL pinned at rev 1ef0500f, LEZ at tag v0.2.4, risc0 =3.0.5; `rust-toolchain.toml` 1.94.0
 - [x] T4 `ring`/riscv32: fixed upstream; guests build from a fresh toolchain (clean run) and documented in docs/m0/riscv32-build.md in LEZ v0.2.4 (`risc0-zkvm default-features=false, features=["std"]`). D4 = confirm the guest builds from a clean host, record remaining pins (`ruint =1.17.0`, `enum-ordinalize 4.3.2`, `getrandom_backend="custom"`, macOS CFLAGS) in `docs/m0/riscv32-build.md`
 - [x] T5 Harness SMOKE GREEN on hetzner2 2026-09-02 (boot→deploy→initialize→RPC read-back): `harness/localnet.sh` boots a standalone sequencer on a scratch dir, bootstraps a wallet, exposes JSON-RPC probe helpers; honours `CARGO_TARGET_DIR`; no `ss`/`pkill` dependency (D3)
-- [~] T6 CI (workflows written, never run — needs a GitHub push, gated on Davit): ci-image workflow (content-hashed GHCR image, LP-0002 shape), `argo-ci.yml` = fmt + clippy + unit + harness e2e smoke at `RISC0_DEV_MODE=1` (D1)
+- [~] T6 CI: repo Kolkheti-Labs/argo public, PR #1 open (draft), first run in flight 2026-09-02: ci-image workflow (content-hashed GHCR image, LP-0002 shape), `argo-ci.yml` = fmt + clippy + unit + harness e2e smoke at `RISC0_DEV_MODE=1` (D1)
 - [x] T7 Evidence model (spike runners snapshot raw getTransaction/getProgramIds into evidence/; harness/capture.sh folded into the spike scripts): `harness/capture.sh` snapshots raw JSON-RPC responses per claim into `evidence/`, regenerable by one command (testnet wipes orphan ids)
 
 ### Week 2
@@ -63,7 +63,11 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 ## Blocked / needs Davit
 
 - Contract signature confirmation (Gate 0)
-- Any push to GitHub (standing rule: none without explicit approval)
+- Pushes to Kolkheti-Labs/argo approved by Davit 2026-09-02 (public repo, milestone-PR flow). Other repos still need explicit approval.
+
+## Submission format (from how RFP-001/002 got accepted)
+
+Logos never ticks the tracker's body checkboxes. Acceptance = a Logos reviewer (danisharora099) reviewing a PR in the grantee's repo titled `RFP-00X Milestone N: …`, with CI run link, deliverable→file map, test counts, exact dependency pins, reproducible captures; then "Mn accepted. Marking logos-co/rfp#N approved" + `milestone-approved` label; hackyguru closes the issue for payout 9–15 days later. Reviewer rebuilds at exact SHA with `--locked` and reproduces committed captures; tag the accepted revision. Doc packets (SDK + CLI, logos-docs `doc-packet.yml`) take 10+ review rounds: start early (M5). Our M0 PR: https://github.com/Kolkheti-Labs/argo/pull/1.
 
 ## Review (2026-09-02, end of day 1)
 

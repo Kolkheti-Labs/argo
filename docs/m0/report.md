@@ -1,8 +1,8 @@
 # M0 milestone report — Argo (RFP-008)
 
-Status: DRAFT, filled as deliverables land. Final version is posted on the
-milestone tracker https://github.com/logos-co/rfp/issues/170 and links every
-claim to an artifact in this repository.
+Status: DRAFT. Submitted as https://github.com/Kolkheti-Labs/argo/pull/1
+(milestone PR, the review surface Logos uses); tracker
+https://github.com/logos-co/rfp/issues/170.
 
 ## Deliverables
 
