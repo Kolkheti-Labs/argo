@@ -2,7 +2,9 @@
 
 Milestone: M0, 2 weeks, $5,000, invoiced on the "done" gate in `docs/m0/acceptance.md`.
 Source of truth for deliverables: accepted proposal, milestone table
-(logos-co/rfp issue 141, mirror at ~/Desktop/rfp008-proposal.md).
+(logos-co/rfp issue 141, mirror at ~/Desktop/rfp008-proposal.md) and the M0
+tracker https://github.com/logos-co/rfp/issues/170 (done gate includes spec
+reviewed WITH LOGOS and CI green against the harness).
 
 Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-09-02.
 
@@ -40,7 +42,7 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 - [x] T10 Spike S-C: NO-GO → PDA polling (verdicts.md): event/log surface probed on v0.2.4; verdict = events vs PDA polling for liquidator/monitor
 - [x] T11 Spike S-D: GO, cycle table in verdicts.md (account size is the cost driver): measured cycles for a supply-shaped and a liquidate-shaped guest; compare to any runtime limit; note the >6 GB RAM outer-prover fact
 - [x] T12 Spike S-E: GO w/ init-step design change; fee N/A on v0.2.4: v0.2.4 has no fees, so the live question is the ephemeral-account init rule (deshield to a never-initialised public account is rejected) and linkability; record the fee design for PR 801's model
-- [~] T13 State-layout spec drafted with v0.2.4 facts; awaiting rekt/adp review: `docs/spec/state-layout.md`: PDA seeds, account byte layouts, touched-set per instruction, sharding argument for P2 (D5)
+- [~] T13 State-layout spec drafted with v0.2.4 facts; awaiting rekt/adp review, then Logos review on issue 170: `docs/spec/state-layout.md`: PDA seeds, account byte layouts, touched-set per instruction, sharding argument for P2 (D5)
 - [x] T14 Verdicts (all five written): `docs/m0/verdicts.md`, one go/no-go per spike; any no-go carries the M1–M3 design change
 - [x] T15a Fresh-toolchain + fresh-clone run GREEN on hetzner2 volume 2026-09-02 (27 min); [ ] T15b same script on a never-used box (needs a box from Davit) (hetzner2 volume or a fresh box): `git clone && ./harness/localnet.sh && cargo test` green from nothing. Record host, commit, log
 - [x] T16 adversarial-verify pass 2026-09-02: 3 findings, all fixed and re-run
@@ -56,7 +58,6 @@ Gate 0 (before any paid engineering): contract signed. Confirmed by Davit: 2026-
 ## Blocked / needs Davit
 
 - Contract signature confirmation (Gate 0)
-- Decision: update issue 141's LP-0002 reference from PR 97 to PR 133 (public edit)
 - Any push to GitHub (standing rule: none without explicit approval)
 
 ## Review (2026-09-02, end of day 1)
