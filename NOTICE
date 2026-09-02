@@ -8,7 +8,11 @@ at your option.
 
 Third-party / upstream code
 ---------------------------
-No upstream source is vendored into this repository at this time. Argo depends on
+Vendored files:
+  * tools/idl-gen/src/main.rs — from logos-blockchain/lez-programs
+    (tools/idl-gen/src/main.rs, commit 6956b23), MIT.
+
+Otherwise no upstream source is vendored into this repository. Argo depends on
 the SPEL framework (logos-co/spel, MIT) and the Logos Execution Zone
 (logos-blockchain/logos-execution-zone, MIT, Copyright (c) 2025 Vac) as Cargo
 dependencies only. logos-blockchain/lez-programs (MIT) is used as the layout

@@ -10,6 +10,7 @@ members = [
     "spikes/vault/methods",
     "harness/runner",
     "spikes/integration_tests",
+    "tools/idl-gen",
 ]
 exclude = [
     "programs/argo_lending/methods/guest",

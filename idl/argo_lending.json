@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "name": "argo_lending",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "admin",
+          "type": "account_id"
+        }
+      ]
+    }
+  ],
+  "instruction_type": "argo_lending_core::Instruction"
+}

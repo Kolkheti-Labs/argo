@@ -39,6 +39,6 @@ the fix. No `[patch]` section is needed.
 The two must produce the same image id. The clean-host verification records
 both ids for `argo_lending` and `spike_vault`.
 
-## Clean-host verification log
+## Verification
 
-(filled by T15)
+See `docs/m0/verification-log.md`: both guests built on hetzner2 (x86_64) via `risc0_build::embed_methods` on 2026-09-02; the clean-environment run repeats it from a fresh toolchain.
