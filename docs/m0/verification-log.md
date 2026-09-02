@@ -42,7 +42,7 @@ Defects found only by building, not by reading:
 
 | S-D | `spikes/S-D/run.sh` | GO, cycle table in `docs/m0/verdicts.md` |
 | S-C | `spikes/S-C/run.sh` | NO-GO (no event surface), 8.8 ms/getAccount local |
-| S-E | `spikes/S-E/run.sh` | E0b rejected at prover; E0 init tx c061835f… block 29; E1 deshield 872749a0… block 56; E2 A→B 40da2bcb… block 109; E3 reshield f8f89f79… block 136; A final balance 0 |
+| S-E | `spikes/S-E/run.sh` (rerun with evidence capture, port 3049) | E0b rejected at prover (`Cannot claim unauthorized account`); E0 init tx 863ad6bf… block 30; E1 deshield c31b3ee0… block 56 (A=300); E2 init B d8e7e06a… block 81, A→B d3a2ef11… block 107; E3 reshield 50589d69… block 134; A final balance 0. Raw payloads: `evidence/localnet/S-E-*` |
 
 Executor errors observed (quoted from the run, they are the S-A/S-B evidence):
 
