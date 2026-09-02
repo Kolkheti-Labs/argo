@@ -10,14 +10,15 @@
           "writable": true,
           "signer": false,
           "init": false
-        }
-      ],
-      "args": [
+        },
         {
           "name": "admin",
-          "type": "account_id"
+          "writable": true,
+          "signer": true,
+          "init": false
         }
-      ]
+      ],
+      "args": []
     }
   ],
   "instruction_type": "argo_lending_core::Instruction"
