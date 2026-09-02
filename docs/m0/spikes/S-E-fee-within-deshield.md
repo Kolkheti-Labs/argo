@@ -41,22 +41,23 @@ On the standalone sequencer with the v0.2.4 wallet:
   do E0).
 - E1 deshield: private account P → public account A (derived by the SDK
   from a nonce). Confirm A is funded and its `program_owner` after this step.
-- E2 interact: A calls `spike_vault::PayIn` (supply-shaped). Confirm the tx is
-  accepted with NO other account of the user's in `account_ids`.
+- E2 interact: A signs a public operation. In M0 that operation is a native
+  transfer A → B (B initialised first), not an Argo instruction; what it
+  proves is that the deshield output can act as a public signer.
 - E3 reshield: A → private P' (a different note), A left at zero.
-- E4 linkability check: from the public chain data alone (`getBlock` decode),
-  list every account that co-appears with A. Expected: only Argo PDAs and the
-  token program's accounts; never P or the user's other public accounts.
+- E4 linkability check (NOT evaluated in M0): from the public chain data
+  alone, list every account that co-appears with A. Raw blocks are saved
+  (`evidence/localnet/S-E-blocks.json`) but decoding them needs a borsh
+  decoder that M5's SDK work provides.
 - E5 record for the design doc how a future fee would have to be paid:
   which account the sequencer would debit if fees land on `balance`, and
   whether the deshield output can carry native balance plus token holding in
   one tx (the "deposit token + native gas" atomic action the RFP describes).
 
 ## Observable
-E1–E3 accepted with A's `program_owner` documented; E4's co-appearance set.
-GO iff E4 shows only protocol accounts and the E0 → E1 → E2 → E3 sequence is
-expressible by the SDK as one user action (the user signs once for a batch the
-SDK submits in order, gated on each landing). The fee sub-question is recorded as
+E0b rejected, E1–E3 landed with A's balances 300 then 0 (the script exits
+non-zero otherwise). Because E4 is not evaluated, the best M0 verdict is
+PARTIAL: the init-step design change is established, linkability is not. The fee sub-question is recorded as
 "not applicable on v0.2.4, design reserved" with the E5 notes.
 
 ## If no-go

@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
-# S-B: custody rule on the builtin token program, decided by b1..b4 in
-# spikes/integration_tests. B5 (which token the testnet runs) is a separate
-# read-only probe: harness/probe-testnet-token.sh.
+# S-B: custody rule on the builtin token program, decided by b1..b5 in
+# spikes/integration_tests (b5 = the builtin's image id equals the token id the
+# public testnet registers, from evidence/testnet/). A foreign-program debit
+# attempt was not built in M0; the wrong-seed case (a4) exercises the same
+# runtime check.
 set -uo pipefail
 R="$(cd "$(dirname "$0")/../.." && pwd)"
-LOG="$R/.spike-S-B.log"
+EV="$R/evidence/localnet"; mkdir -p "$EV"
 export RISC0_DEV_MODE="${RISC0_DEV_MODE:-1}"
-cargo test --release -p spike_integration_tests --test spike_ab -- a1_b1 a5_b4 b2_ b5_ --nocapture 2>&1 | tee "$LOG"
-if grep -q 'test result: ok' "$LOG" && ! grep -q 'FAILED' "$LOG"; then
-  echo "VERDICT S-B: GO -- anyone credits a claimed vault; only the program debits it (by seed); credit-before-claim rejected, claim-first ordering confirmed; builtin token id == testnet capture"
+cargo test --locked --release -p spike_integration_tests --test spike_ab -- a1_b1 a5_b4 b2_ b5_ --nocapture 2>&1 | tee "$R/.spike-S-B.log"
+rc=${PIPESTATUS[0]}
+grep -E "^test |^test result|^B[0-9] error|^A5 error|panicked at" "$R/.spike-S-B.log" | sed -E 's/ finished in [0-9.]+s//' > "$EV/S-B.run.txt"
+if [ "$rc" -eq 0 ]; then
+  echo "VERDICT S-B: GO -- anyone credits a claimed vault; only the program debits it (by seed); credit before claim is rejected (ClaimedUnauthorizedAccount) so create_market claims first; builtin token id == testnet capture"
 else
-  echo "VERDICT S-B: NO-GO -- see $LOG"
+  echo "VERDICT S-B: NO-GO -- tests failed or did not run (exit $rc), see .spike-S-B.log"
 fi
+exit "$rc"

@@ -39,7 +39,7 @@ cmd_build() {
       --root "$BIN" --target-dir "$TARGET" wallet \
       || die "wallet install failed"
   echo "=== build Argo guests (embedded via risc0_build) + harness runner ==="
-  cargo build --release -p argo_lending_methods -p spike_vault_methods -p harness_runner \
+  RISC0_BUILD_LOCKED=1 cargo build --locked --release -p argo_lending_methods -p spike_vault_methods -p harness_runner \
       || die "argo build failed"
 }
 
@@ -113,11 +113,15 @@ cmd_smoke() {
   CONFIG_ID=$(printf '%s\n' "$INIT_OUT" | sed -n 's/^CONFIG_ID=//p' | head -1)
   wait_until 60 "Config PDA $CONFIG_ID initialised" rpc_account_initialized "$CONFIG_ID"
   echo "=== read back over JSON-RPC ==="
+  ADMIN_ID=$(printf '%s
+' "$INIT_OUT" | sed -n 's/^ADMIN_ID=//p' | head -1)
   rpc_account "$CONFIG_ID" | python3 -c '
 import json,sys
 r=json.load(sys.stdin)["result"]
 assert any(r["program_owner"]), "config not owned"
-print("config program_owner =", r["program_owner"])' || die "read-back failed"
+print("config program_owner =", r["program_owner"], "data bytes =", len(r["data"]))' || die "read-back failed"
+  # The admin recorded in Config.data must be the account that signed Initialize.
+  "$RUN/argo_read_config" "$CONFIG_ID" | tee /dev/stderr | grep -q "^ADMIN=$ADMIN_ID$" || die "Config.admin does not match the signer"
   echo "=== ARGO LOCALNET SMOKE GREEN (program $PROGRAM_ID) ==="
 }
 

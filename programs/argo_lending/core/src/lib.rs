@@ -10,8 +10,9 @@ use serde::{Deserialize, Serialize};
 /// Instruction set (M0 subset).
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Instruction {
-    /// Claim the singleton `Config` PDA. Callable once.
-    Initialize { admin: AccountId },
+    /// Claim the singleton `Config` PDA. Callable once. Accounts: `config` (the
+    /// PDA), `admin` (signer; becomes the admin authority).
+    Initialize,
 }
 
 /// Singleton configuration account.

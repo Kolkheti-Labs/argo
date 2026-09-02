@@ -21,7 +21,6 @@ the fix. No `[patch]` section is needed.
 | Pin | Where | Why |
 | --- | --- | --- |
 | `ruint = "=1.17.0"` | guest `Cargo.toml` | ruint 1.18 raised MSRV to rustc 1.90; the risc0 guest toolchain ships 1.88 |
-| `enum-ordinalize`, `enum-ordinalize-derive` 4.3.2 | guest `Cargo.lock` | later versions fail on the guest toolchain (SPEL `spel init` pins them) |
 | `CFLAGS_riscv32im_risc0_zkvm_elf = "-march=rv32im -nostdlib"` | `.cargo/config.toml` | cc-rs injects macOS flags into the RISC-V cross compiler otherwise |
 | `[profile.release] debug = 0, strip = "symbols"` | guest `Cargo.toml` | part of the image id; changing it changes the program id and every PDA |
 | `risc0-build = "=3.0.5"`, r0vm 3.0.5, cargo-risczero 3.0.5 | methods crates, CI image | image id reproducibility |
@@ -36,8 +35,12 @@ the fix. No `[patch]` section is needed.
    the deployed artifact and for the `check-idl`-style reproducibility gate
    from M1 on.
 
-The two must produce the same image id. The clean-host verification records
-both ids for `argo_lending` and `spike_vault`.
+Only path 1 was run in M0 (its image ids are in the verification log). Path 2
+is the deployment path from M1 on, where its id will be compared against
+path 1's. Both guest workspaces commit their `Cargo.lock` and CI sets
+`RISC0_BUILD_LOCKED=1`, so path 1's image id is a function of the committed
+tree; `enum-ordinalize` resolves to 4.4.2 there and builds fine on the 1.94.1
+guest toolchain (the 4.3.2 pin `spel init` applies was not needed).
 
 ## Verification
 

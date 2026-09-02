@@ -2511,12 +2511,14 @@ dependencies = [
  "anyhow",
  "argo_lending_core",
  "argo_lending_methods",
+ "borsh",
  "common",
  "hex",
  "lee",
  "lee_core",
  "sequencer_service_rpc",
  "spike_vault_methods",
+ "testnet_initial_state",
  "tokio",
  "wallet",
 ]
@@ -2981,6 +2983,15 @@ name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
+
+[[package]]
+name = "idl-gen"
+version = "0.0.1"
+dependencies = [
+ "serde_json",
+ "spel-framework-core",
+ "toml",
+]
 
 [[package]]
 name = "idna"
@@ -7069,6 +7080,7 @@ version = "1.0.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14"
 dependencies = [
+ "indexmap 2.14.1",
  "itoa",
  "memchr",
  "serde",
@@ -7350,6 +7362,23 @@ dependencies = [
  "log",
  "rand 0.8.8",
  "sha1",
+]
+
+[[package]]
+name = "spel-framework-core"
+version = "0.6.0"
+source = "git+https://github.com/logos-co/spel.git?rev=1ef0500f8fc8ce3ddf95523726ae159db83f744f#1ef0500f8fc8ce3ddf95523726ae159db83f744f"
+dependencies = [
+ "base58",
+ "borsh",
+ "lee_core",
+ "proc-macro2",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "syn 2.0.119",
+ "thiserror 1.0.69",
+ "toml",
 ]
 
 [[package]]

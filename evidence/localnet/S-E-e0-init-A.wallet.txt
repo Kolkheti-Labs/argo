@@ -1,0 +1,5 @@
+Transaction hash is 493bf1122e88e65e9708bac41bbc7c190d54593f977c6fbba0a1818c14933a23
+Transaction is included in block 29
+Transaction data is Public(PublicTransaction { message: Message { program_id: "fe96c4228babbe8bc578e3e25b884cacb07f8c86541f27ed676789875eef875a", account_ids: [436TQSMAPcyddcKj8HH7HmaeByMkyxMacd8CU4hhbqiW], nonces: [Nonce(0)], instruction_data: [1] }, witness_set: WitnessSet { signatures_and_public_keys: [(6f5e31c836e8edea1d86087bbe47278e639bb4469d9f7a0ee2f0c6a496a2b36d6528a192f1daeaa09be2b445274d6d5f9455ba70d06fbe1c2b5204f8073df490, d52a68948b695b089af05cd552d1e5b6023b193396cf112caa48b37396e56606)] } })
+Stored persistent accounts at /mnt/HC_Volume_105321168/argo/.localnet-argo/wallet/storage.json
+Stored statistics at /mnt/HC_Volume_105321168/argo/.localnet-argo/wallet/statistics.json

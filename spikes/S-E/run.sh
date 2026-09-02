@@ -23,7 +23,7 @@ w() { RUST_LOG=error "$W" "$@"; }
 wev() {
   local tag=$1; shift
   local out; out=$("$W" "$@" 2>&1); local rc=$?
-  printf '%s\n' "$out" > "$EV/S-E-$tag.wallet.log"
+  printf '%s\n' "$out" > "$EV/S-E-$tag.wallet.txt"
   printf '%s\n' "$out" | sed -n 's/^Transaction hash is //p' | while read -r h; do
     wait_until 60 "tx $h in a block" rpc_tx_landed "$h" || true
     rpc_transaction "$h" > "$EV/S-E-$tag-$h.getTransaction.json"
@@ -50,10 +50,11 @@ A=$(idof A); [ -n "$A" ] || die "no A id"
 echo "A=$A pre-state: $(rpc_account "$A" | head -c 200)"
 
 echo "== E0b: deshield P -> A while A is uninitialised =="
+E0B_OK=0
 if wev e0b auth-transfer send --from "Private/$P" --to "Public/$A" --amount 300; then
-  sleep 5; if rpc_account_funded "$A"; then E0B="landed (A funded without init)"; else E0B="accepted by wallet but never landed (dropped)"; fi
+  sleep 5; if rpc_account_funded "$A"; then E0B="landed (A funded without init)"; else E0B="accepted by wallet but never landed (dropped)"; E0B_OK=1; fi
 else
-  E0B="rejected by wallet/prover"
+  E0B="rejected by wallet/prover"; grep -q "Cannot claim unauthorized account" "$EV/S-E-e0b.wallet.txt" && E0B_OK=1
 fi
 echo "E0b: $E0B"
 
@@ -64,8 +65,8 @@ echo "A program_owner: $(rpc_field "$A" 'r["program_owner"]')"
 
 echo "== E1: deshield P -> A =="
 wev e1-deshield auth-transfer send --from "Private/$P" --to "Public/$A" --amount 300 || die "deshield P->A"
-wait_until 60 "A funded" rpc_account_funded "$A"
-echo "A balance: $(rpc_field "$A" 'r["balance"]')"
+wait_until 60 "A funded" rpc_account_funded "$A" || die "E1 deshield never landed"
+A_AFTER_E1=$(rpc_field "$A" 'r["balance"]'); echo "A balance: $A_AFTER_E1"
 
 echo "== E2: A signs a public op (transfer A -> B) =="
 w account new public -l B >/dev/null 2>&1 || die "account new public B"
@@ -73,19 +74,18 @@ B=$(idof B)
 wev e2-init-B auth-transfer init --account-id "Public/$B" || die "init B"
 wait_until 60 "B initialised" rpc_account_initialized "$B"
 wev e2-public-A-to-B auth-transfer send --from "Public/$A" --to "Public/$B" --amount 100 || die "public A->B"
-wait_until 60 "B funded" rpc_account_funded "$B"
+wait_until 60 "B funded" rpc_account_funded "$B" || die "E2 public transfer never landed"
 
 echo "== E3: reshield A -> new private P2 =="
 w account new private -l P2 >/dev/null 2>&1 || die "account new private P2"
 P2=$(idof P2)
 wev e3-reshield auth-transfer send --from "Public/$A" --to "Private/$P2" --amount 200 || die "reshield A->P2"
-sleep 5
-echo "A final balance: $(rpc_field "$A" 'r["balance"]')"
+a_drained() { [ "$(rpc_field "$A" 'r["balance"]')" = "0" ]; }
+wait_until 60 "A drained by reshield" a_drained || die "E3 reshield never landed"
+A_FINAL=$(rpc_field "$A" 'r["balance"]'); echo "A final balance: $A_FINAL"
 
-echo "== E4: which accounts co-appear with A on-chain =="
+echo "== E4: raw blocks saved; linkability is NOT evaluated in M0 (needs a borsh decoder) =="
 TIP=$(rpc_tip); rpc getBlockRange "[1,$TIP]" > "$EV/S-E-blocks.json"
-grep -o "$A" "$EV/S-E-blocks.json" | wc -l | sed 's/^/A occurrences in raw blocks 1..'"$TIP"': /'
-for X in "$FUNDER" "$P" "$B" "$P2"; do printf '%s occurrences: ' "$X"; grep -o "$X" "$EV/S-E-blocks.json" | wc -l; done
 
 cat > "$EV/S-E-ids.txt" <<IDS
 FUNDER=$FUNDER
@@ -94,4 +94,10 @@ A=$A
 B=$B
 P2=$P2
 IDS
-echo "VERDICT S-E: GO-WITH-CHANGE -- no tx fees on v0.2.4 (fee half N/A); E0b=$E0B; after own-key init the deshield->interact->reshield sequence landed (wallet logs + raw getTransaction per step in evidence/localnet/S-E-*); E4 linkability NOT decoded (raw blocks are not base58), needs a decoder in M5"
+if [ "$E0B_OK" = 1 ] && [ "$A_AFTER_E1" = 300 ] && [ "$A_FINAL" = 0 ]; then
+  echo "VERDICT S-E: PARTIAL -- fee half not applicable (v0.2.4 has no tx fees); deshield into an uninitialised public account is $E0B; after an own-key init, deshield (A=300) -> public op signed by A -> reshield (A=0) all landed (wallet output + raw getTransaction per step in evidence/localnet/S-E-*); E4 linkability NOT evaluated in M0"
+  exit 0
+else
+  echo "VERDICT S-E: NO-GO -- observation contradicts the expected sequence (E0b_ok=$E0B_OK, A after E1=$A_AFTER_E1, A final=$A_FINAL)"
+  exit 1
+fi

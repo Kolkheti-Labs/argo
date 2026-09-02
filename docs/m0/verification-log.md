@@ -17,14 +17,16 @@ Host: Hetzner CX43, 8 vCPU / 15 GB, Ubuntu, x86_64. Toolchain: rust 1.94.0
 | pure crates | `cargo test -p argo_core -p irm_core` | 7 passed (5 + 2), also green on macOS arm64 |
 | host crates | `cargo check -p spike_vault_program -p argo_lending_program ...` (macOS) | clean after adding `borsh` dep |
 | guest build (D4) | `cargo build --release -p harness_runner` (builds both `*_methods` via `risc0_build::embed_methods`) | OK. `argo_lending` ELF 183,388 B, `spike_vault` ELF 208,868 B |
-| S-A/S-B tests | `cargo test --release -p spike_integration_tests --test spike_ab` | 7 passed, 0 failed, 5.89 s (`RISC0_DEV_MODE=1`, real guest ELFs, builtin token program) |
+| S-A/S-B tests | `cargo test --release -p spike_integration_tests --test spike_ab` | 8 passed (a1–a6, b2, b5), 0 failed (`RISC0_DEV_MODE=1`, real guest ELFs, builtin token program) |
 
-Image ids from this build (they change with any guest source or profile
-change, so they are recorded, not relied on):
+Image ids from this build on the dev box (they change with any guest source,
+lockfile or profile change; the guest lockfiles are committed and CI builds
+with `RISC0_BUILD_LOCKED=1` so the ids are a function of the tree; the Docker
+`cargo risczero build` path was not run in M0):
 
 ```
-ARGO_LENDING_ID = [2758225782, 2927683024, 2803086246, 1614634390, 326454054, 3248717555, 1139695692, 1910660946]
-SPIKE_VAULT_ID  = [3060177745, 3358717213, 3856548115, 2817312362, 2773267506, 1305010604, 221952450, 289626746]
+ARGO_LENDING_ID = [1155194347, 1601915833, 802455914, 395287946, 3013651780, 1058916772, 1694453169, 1300607297]
+SPIKE_VAULT_ID  = [4107046892, 3062661010, 1329261408, 143454969, 3861191297, 2985587711, 1721357874, 101925694]
 ```
 
 Defects found only by building, not by reading:
@@ -42,7 +44,7 @@ Defects found only by building, not by reading:
 
 | S-D | `spikes/S-D/run.sh` | GO, cycle table in `docs/m0/verdicts.md` |
 | S-C | `spikes/S-C/run.sh` | NO-GO (no event surface), 8.8 ms/getAccount local |
-| S-E | `spikes/S-E/run.sh` (rerun with evidence capture, port 3049) | E0b rejected at prover (`Cannot claim unauthorized account`); E0 init tx 863ad6bf… block 30; E1 deshield c31b3ee0… block 56 (A=300); E2 init B d8e7e06a… block 81, A→B d3a2ef11… block 107; E3 reshield 50589d69… block 134; A final balance 0. Raw payloads: `evidence/localnet/S-E-*` |
+| S-E | `spikes/S-E/run.sh` (port 3049) | E0b rejected at prover (`Cannot claim unauthorized account`, `evidence/localnet/S-E-e0b.wallet.txt`); E0 init tx 493bf112… block 29; E1 deshield 6aca60f7… block 56 (A=300); E2 init B 54cebd8c… block 82, A→B b6c19015… block 109; E3 reshield f3ff12d1… block 136; A final balance 0; verdict PARTIAL (E4 not evaluated). Raw payloads: `evidence/localnet/S-E-*` |
 
 Executor errors observed (quoted from the run, they are the S-A/S-B evidence):
 
@@ -62,6 +64,19 @@ B2  InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: CWU2Cn... })
    bootstrap with `HOME` redirected, and no longer swallows `rzup install`
    failures.
 
+## Fix round after the adversarial review (2026-09-03, hetzner2)
+
+A 25-agent adversarial review of the first submission confirmed 15 findings
+(stale root `Cargo.lock`, no guest lockfiles, spike runners that exited 0 on
+failure, S-E evidence ignored by `*.log`, docs describing experiments wider
+than what ran, `Initialize` with an unauthenticated admin, clean-host script
+cloning the bare `main`). After the fixes, on hetzner2 with
+`RISC0_BUILD_LOCKED=1`: `cargo test --locked` 16 passed; clippy `--locked`
+clean; `./harness/localnet.sh smoke` green with `Config.admin` equal to the
+funder that signed `Initialize`; `./spikes/run.sh all` exit 0 with verdicts
+S-A GO, S-B GO, S-D GO (asserted), S-C NO-GO, S-E PARTIAL; 26 evidence files
+regenerated. The image ids above are from this build.
+
 ## CI (GitHub Actions, ubuntu-latest, container from `.github/docker/ci.Dockerfile`)
 
 **GREEN 2026-09-02, PR #1, run https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127**: `ci-image` (10 min), `lint` (fmt +
@@ -79,13 +94,17 @@ steps via `harness/clean-host.sh`. Same kernel and apt packages as the dev
 box, so this is not the final clean-host run; that needs a box that never
 built Argo.
 
-**GREEN, 2026-09-02T19:18:46Z at commit e06df05** (`harness/clean-host.sh`,
-27 min wall clock from empty toolchain homes on 8 vCPU). Steps and outcomes:
+**GREEN, 2026-09-02T19:18:46Z** (`harness/clean-host.sh`, 27 min wall clock
+from empty toolchain homes on 8 vCPU). The run was made from a bundle of a
+pre-rebase commit whose tree is identical to `522ddda` on the `m0` branch
+(the original SHA `e06df05` no longer exists after the branch was rebased
+onto the base commit; `git diff e06df05 522ddda` was empty at the time).
+Steps and outcomes:
 
 | Step | Outcome |
 | --- | --- |
 | rustup (1.94.0 via `rust-toolchain.toml`), rzup rust 1.94.1 / cpp 2024.1.5 / r0vm 3.0.5 / cargo-risczero 3.0.5 | installed into `argo-clean/{rustup,cargo,risc0}` |
-| `git clone -b main <bundle>` | HEAD e06df05 |
+| `git clone <bundle>` | tree == `522ddda` |
 | `cargo test -p argo_core -p irm_core` | 7 passed |
 | `./harness/localnet.sh smoke` | sequencer + wallet built from source, `argo_lending` deployed as `d9b7db26…`, Config PDA initialised and read back: GREEN |
 | `spikes/run.sh all` | S-A GO (6 tests), S-B GO (4 tests incl. b5 token-id match), S-D GO (heaviest leg 271,395 cycles; 50 KB account 23.68M), S-C NO-GO (8.44 ms/getAccount), S-E landed end to end (E0b rejected at prover) |

@@ -40,14 +40,18 @@ runs it:
 - B1 claim-then-credit: `Init` (chained `InitializeAccount`, PDA seed), then a
   plain user `Transfer` into the vault → accepted.
 - B2 credit-before-claim: plain `Transfer` into a never-initialised PDA →
-  observe what owns it afterwards; then `Init` → expect rejection (already
-  owned). This pins the ordering rule for `create_market`.
+  observed outcome: the transfer itself is REJECTED (`ClaimedUnauthorizedAccount`,
+  a PDA cannot be claimed `Authorized` at top level), the PDA stays default,
+  and a subsequent `Init` succeeds. So the ordering rule for `create_market`
+  is "claim first", and a stray early credit cannot poison the PDA.
 - B3 authorised debit: Argo `PayOut` → accepted.
-- B4 unauthorised debit: user-signed `Transfer` out of the vault → rejected;
-  foreign program chained `Transfer` out of the vault → rejected.
-- B5 which token: does the live testnet's token program id match the builtin
-  or lez-programs' token? Compare `get_program_ids` on
-  `https://testnet.lez.logos.co` with both image ids.
+- B4 unauthorised debit: user-signed `Transfer` out of the vault → rejected.
+  A foreign program chaining a `Transfer` out of the vault was NOT built in
+  M0 (see S-A A5).
+- B5 which token: does the live testnet's `token` program id equal the
+  builtin these tests execute? Test `b5_builtin_token_matches_testnet_capture`
+  compares the committed `getProgramIds` capture with `programs::token().id()`.
+  lez-programs' authority token id was not computed.
 
 ## B5 evidence (captured 2026-09-02T18:15Z, tip block 34812)
 `evidence/testnet/getProgramIds-20260902T181548Z.json`: the testnet registers
@@ -60,7 +64,7 @@ from `timestamp_validity_window` / block-derived input instead, or Argo ships
 its own clock reference. Carry this into the state-layout spec §5 and M2.
 
 ## Observable
-B1, B3 accepted; B2's second step and B4 rejected, with `getAccount` snapshots.
+B1, B3 accepted; B2's credit and B4 rejected, with state snapshots.
 B5 yields the program id Argo must target (compare `getProgramIds` on the
 testnet with the builtin's id and lez-programs' `TOKEN_ID`). GO iff B1–B4 hold on the chosen
 token program.

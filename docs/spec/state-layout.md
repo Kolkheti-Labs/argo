@@ -45,10 +45,12 @@ vault pattern safe:
   `token::Transfer` the same way. Anyone can credit it with a plain transfer
   once it exists. A plain transfer into a not-yet-claimed PDA is rejected, so
   `create_market` must claim both vaults before any deposit (S-B B2).
-- PDA id = SHA-256 of `"/LEE/v0.2/AccountId/PDA/" ‖ program_id ‖ seed`, a
-  single 32-byte seed, no bump. Seeds above are hashed into 32 bytes as
-  `seed = SHA-256(domain ‖ fields)`; the client and guest share the function
-  in `argo_lending_core`.
+- PDA id = SHA-256 over a fixed 96-byte buffer: the 32-byte prefix
+  `"/LEE/v0.2/AccountId/PDA/"` (24 ASCII bytes + 8 NUL padding) ‖ program_id
+  (32) ‖ seed (32); a single 32-byte seed, no bump. Seeds above will be hashed
+  into 32 bytes as `seed = SHA-256(domain ‖ fields)` by a function in
+  `argo_lending_core` that M1 adds (M0 ships only the zero-padded `config`
+  seed).
 - Account size drives compute (about 33M cycles for a 100 KB owned account),
   so every Argo account stays under 1 KB; `Config`'s enabled sets are bounded
   (32 LLTVs, 8 IRMs) rather than open-ended.
@@ -65,7 +67,7 @@ vault pattern safe:
 | borrow | Market, Position(owner), LoanVault(−), receiver(+) | Oracle price | token::Transfer LoanVault→receiver, PDA-authorised |
 | repay | Market, Position(owner), LoanVault(+), payer(−) | — | token::Transfer payer→LoanVault |
 | liquidate | Market, Position(borrower), LoanVault(+), CollVault(−), liquidator loan(−), liquidator coll(+) | Oracle price | token::Transfer liquidator→LoanVault; token::Transfer CollVault→liquidator, PDA-authorised |
-| flash_loan | LoanVault(−, then +), borrower holding | — | token::Transfer LoanVault→borrower; tail-call borrower continuation; repay_flash continuation; token::Transfer borrower→LoanVault |
+| flash_loan | LoanVault(−, then +), borrower holding | — | token::Transfer LoanVault→borrower; chained call into the borrower program; chained self-call `repay_flash`; token::Transfer borrower→LoanVault. Constraint from S-A: every chained call's pre-states must be predicted exactly, so `repay_flash` can only name the vault and the borrower holding at their expected post-callback balances |
 | accrue_interest (implicit) | Market, Position(fee recipient) when fee > 0 | — | none |
 | set_authorization | Authorization(authorizer, manager) | — | none |
 | admin: enable_lltv / enable_irm / set_fee / set_fee_recipient | Config | — | none |
@@ -81,8 +83,9 @@ fee is set.
 marketId = H(domain ‖ loan_token ‖ collateral_token ‖ oracle ‖ irm ‖ lltv)
 ```
 
-`H` is SHA-256 via `risc0_zkvm::sha::Impl`, the hash LEZ itself uses for PDA
-ids, so guest and client agree byte-for-byte; `domain = "argo/market/v1"`.
+`H` will be SHA-256 via `risc0_zkvm::sha::Impl`, the hash LEZ itself uses for
+PDA ids, so guest and client agree byte-for-byte; `domain = "argo/market/v1"`
+(M1).
 Fields are Borsh-encoded in the order above; `lltv` is a WAD-scaled u128.
 The Market PDA seed is `SHA-256("argo/market" ‖ marketId)`, and `create_market`
 fails if the PDA is already claimed.

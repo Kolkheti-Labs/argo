@@ -27,24 +27,33 @@ size do to that margin?
   the sequencer, private ones client-side.
 
 ## Experiment
-Guest `spike_math` linking `argo_core` + `irm_core` stubs with real-shaped
-math (u128 mul_div with U256 intermediates, Taylor-compounded accrual, health
-check, LIF derivation) over realistic account layouts:
-- D1 supply-shaped: accrue + share math + 1 chained Transfer. Record executor
-  cycles at `RISC0_DEV_MODE=1` (r0vm session stats) for the Argo execution and
-  for the token execution separately.
-- D2 liquidate-shaped: accrue + health + LIF + seize/repay derivation +
-  bad-debt branch + 2 chained Transfers, plus an oracle price account read.
-- D3 account-size sweep: same D2 with Market account padded to 1 KB, 10 KB,
-  50 KB to plot cycles vs data size and fix Argo's size budget.
-- D4 flash-loan shape: 10-call chain (the max) to see the per-call overhead.
-- D5 one real proof of D2 on hetzner2 (`RISC0_DEV_MODE=0`) for wall-clock
-  and RAM, so M3's benchmark has a baseline.
+What was actually measured (`spikes/integration_tests/tests/spike_d.rs`,
+driving the `spike_vault` guest and the builtin token through risc0's
+executor with the exact inputs the state machine writes):
+- D1 supply-shaped: `PayIn` (state write + one emitted Transfer) as the Argo
+  leg, and the token `Transfer` leg, each measured separately.
+- D2 settlement-shaped: `PayOut` (state write + one Transfer + one self-call)
+  and the `Internal` self-call leg. This is not a liquidation; no accrual,
+  health check, LIF, or oracle read exists in M0.
+- D2b math cost: `Stress { iters }` runs accrual/health/LIF-shaped arithmetic
+  from `argo_core` and `irm_core` (widening mul_div in both rounding modes,
+  share conversions, utilisation) for 100/1000/3000/6000 iterations to get a
+  per-iteration cost; 10,000 iterations must fail with the executor's
+  `Session limit exceeded` (D2c).
+- D3 account-size sweep: `Stress { iters: 0, pad }` with the state account
+  carrying 1 KB / 10 KB / 50 KB of ballast. The handler regenerates the pad
+  byte-by-byte, so the figure is "carrying an account of that size through
+  one execution", not pure paging.
+- A liquidation extrapolation is printed (PayOut leg + 40 math iterations +
+  one more transfer); it is an estimate, and M3 measures the real thing.
+- Not done in M0: a 10-call chain overhead measurement and a real proof at
+  `RISC0_DEV_MODE=0`.
 
 ## Observable
-Cycles per execution for D1–D4; margin = 32M − max(D2). GO iff D2 < 16M
-(50% headroom) with Market ≤ 1 KB, AND the full liquidate chain total
-(Argo leg + 2 token legs) < 32M so it survives a tx-wide budget. PARTIAL if 16M–32M (fits, but M3 must
+Cycles per execution (po2-padded segment sums, the same metric the runtime's
+32M `session_limit` uses, as D2c shows). The test asserts GO iff the heaviest
+measured leg < 16M, the PayOut chain total (three legs) < 32M, and the
+liquidation extrapolation < 16M. Anything else is PARTIAL or NO-GO. PARTIAL if 16M–32M (fits, but M3 must
 budget carefully). NO-GO if D2 > 32M.
 
 ## If no-go

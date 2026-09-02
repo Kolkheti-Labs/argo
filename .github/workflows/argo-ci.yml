@@ -37,7 +37,7 @@ jobs:
       - name: fmt
         run: cargo fmt --all -- --check
       - name: clippy (guests are linted through their host crates; RISC0_SKIP_BUILD skips the guest build here)
-        run: RISC0_SKIP_BUILD=1 cargo clippy --workspace --all-targets -- -D warnings
+        run: RISC0_SKIP_BUILD=1 cargo clippy --locked --workspace --all-targets -- -D warnings
 
   unit:
     needs: ci-image
@@ -50,12 +50,18 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     env:
       RISC0_DEV_MODE: "1"
+      RISC0_BUILD_LOCKED: "1"
     steps:
       - uses: actions/checkout@v5
+      - name: lockfiles are current (root + both guest workspaces)
+        run: |
+          cargo metadata --locked --format-version 1 >/dev/null
+          cargo metadata --locked --format-version 1 --manifest-path programs/argo_lending/methods/guest/Cargo.toml >/dev/null
+          cargo metadata --locked --format-version 1 --manifest-path spikes/vault/methods/guest/Cargo.toml >/dev/null
       - name: pure crates (host)
-        run: cargo nextest run -p argo_core -p irm_core
-      - name: guest builds for riscv32
-        run: cargo build --release -p argo_lending_methods -p spike_vault_methods
+        run: cargo nextest run --locked -p argo_core -p irm_core
+      - name: guest builds for riscv32 (guest lockfiles enforced via RISC0_BUILD_LOCKED)
+        run: cargo build --locked --release -p argo_lending_methods -p spike_vault_methods
       - name: IDL is up to date
         run: ./harness/gen-idl.sh && git diff --exit-code -- idl/
 
@@ -73,12 +79,15 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     env:
       RISC0_DEV_MODE: "1"
+      RISC0_BUILD_LOCKED: "1"
     steps:
       - uses: actions/checkout@v5
       - name: harness smoke (boot sequencer, deploy placeholder, read back)
         run: ./harness/localnet.sh smoke
-      - name: spikes (all five, verdict outputs)
+      - name: spikes (all five; a spike that fails to run or whose decisive tests fail exits non-zero)
         run: ./spikes/run.sh all
+      - name: spike outputs captured as evidence match what is committed (cycle table, test lists)
+        run: git status --porcelain evidence/ && git diff --stat -- evidence/localnet/S-A.run.txt evidence/localnet/S-B.run.txt evidence/localnet/S-D.run.txt
       - name: sequencer log (on failure)
         if: failure()
         shell: bash

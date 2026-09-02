@@ -17,6 +17,10 @@ name = "argo_initialize"
 path = "src/bin/argo_initialize.rs"
 
 [[bin]]
+name = "argo_read_config"
+path = "src/bin/argo_read_config.rs"
+
+[[bin]]
 name = "argo_setup_funder"
 path = "src/bin/argo_setup_funder.rs"
 
@@ -33,3 +37,4 @@ spike_vault_methods = { path = "../../spikes/vault/methods" }
 tokio.workspace = true
 anyhow.workspace = true
 hex.workspace = true
+borsh.workspace = true

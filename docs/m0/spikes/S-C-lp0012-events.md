@@ -27,15 +27,16 @@ without polling every PDA?
 ## Experiment
 - C1 confirm on the standalone sequencer that `getTransaction` for an executed
   Argo-spike tx returns no event/log payload beyond the message and status.
-- C2 measure the polling baseline: with N=200 synthetic Market PDAs and
-  M=1000 Position PDAs in genesis, time one full `getAccount` sweep against
-  the local sequencer, and one `getBlock` tail-follow loop that decodes the
-  txs in each block to derive touched accounts.
-- C3 ask upstream (Discord thread) whether the LP-0012 receipt API is
-  scheduled for a release, and record the answer with date.
+- C2 measure the polling baseline: 200 sequential `getAccount` calls for one
+  account against the local sequencer, giving a per-call latency (the
+  multi-account sweep and the block-tail decoder are M4 work, not M0).
+- C3 (not done in M0) ask upstream whether the events API lands in the next
+  tag; the `dev` branch already has it.
 
 ## Observable
-C1: absence of any event field. C2: sweep latency and RPC count per block.
+C1: `getTransaction` returns only the submitted transaction and its block
+id; there is no receipt object to carry events, and `ProgramOutput` in the
+source has no event field. C2: per-call `getAccount` latency.
 GO means "events exist"; the expected verdict is NO-GO with the polling
 design below adopted.
 

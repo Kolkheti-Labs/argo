@@ -30,10 +30,9 @@ writes applied" or "a program cannot chain into itself / be chained back into".
 - In-tree proof of rollback: `flash_swap_callback_keeps_funds_rollback`
   (`lee/state_machine/src/state/tests/flash_swap.rs:55-108`). Depth test:
   `execution_fails_if_chained_calls_exceeds_depth` (`tests/claiming.rs:143`).
-  A1–A7 below re-run these facts against a *sequencer*, not the in-process
-  state machine, because a failed tx is dropped from the block with no
-  receipt (open issue 160: no error propagation), which is what the client
-  will actually observe.
+  A1–A6 below re-establish these facts with Argo-shaped guests. A failed tx is
+  dropped from the block with no receipt (open issue 160), which is what a
+  client observes; that observation is not part of this spike's tests.
 - Flash-loan constraint: because the caller must precompute the repay leg's
   pre-states, the `repay_flash` self-call can only reference accounts whose
   post-callback state is deterministic (the vault and the borrower's holding
@@ -41,13 +40,14 @@ writes applied" or "a program cannot chain into itself / be chained back into".
   accounts differently makes the whole tx fail, which is the desired outcome.
 
 ## Experiment
-Two layers. (1) The rule verdicts come from the in-process LEZ state machine
+The rule verdicts come from the in-process LEZ state machine
 (`lee::V03State`, `RISC0_DEV_MODE=1`) in `spikes/integration_tests/tests/spike_ab.rs`,
-which executes the real guest ELF and the real builtin token program and
-returns the executor's error type, so every negative case is exact and
-repeatable in seconds. (2) One run of the happy path and one of the A2
-failure against the standalone sequencer, to record what a *client* sees
-(the failed tx never appears in a block; `getTransaction` stays null).
+which executes the real guest ELF and the real builtin token program through
+the same `ValidatedStateDiff::from_public_transaction` path the sequencer
+calls, and returns the executor's error type, so every negative case is exact
+and repeatable in seconds. A sequencer-layer observation of a dropped tx was
+planned and NOT done in M0; the client-side signal (no receipt, tx absent from
+blocks) is documented from source in S-C.
 
 Program `spike_vault` (SPEL guest) with instructions:
 1. `Init` — claim a vault PDA under the token program via chained
@@ -66,12 +66,16 @@ Runs on the standalone sequencer at `RISC0_DEV_MODE=1`:
 - A3 re-entry: `Internal` reached through the chain succeeds; `Internal`
   submitted top-level (caller = default id) is rejected.
 - A4 wrong seed: `PayOut` with a wrong `pda_seeds` entry is rejected.
-- A5 forged debit: a second program tries to chain a `Transfer` out of the
-  vault with the vault marked authorized but no matching seed → rejected.
+- A5 signer-less debit: a top-level user-signed token `Transfer` with the
+  vault as sender → rejected by the token program (`Sender authorization is
+  missing`). A second *program* chaining a Transfer with the vault marked
+  authorised was NOT built in M0; the runtime check it would hit is the same
+  one A4 exercises (`for_public_pda(caller, seed)` mismatch).
 - A6 chain length: 11 chained calls → rejected; 10 → accepted.
-- A7 pre-state prediction: chain Transfer twice from the same vault with the
-  second call's pre_state reflecting the first → accepted; without → rejected
-  with `InconsistentAccountPreState`.
+- A7 (not run in M0): chain Transfer twice from the same vault with and
+  without the second call's pre_state reflecting the first. The prediction
+  rule is exercised implicitly by A1 (the self-call's pre-state must match the
+  post-state of the Argo leg) but the negative case has no test yet.
 
 ## Observable
 For each of A1–A7: sequencer accept/reject plus `getAccount` snapshots of

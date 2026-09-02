@@ -149,7 +149,8 @@ fn s_d_cycle_table() {
     );
     row("D1 token Transfer leg", &token_leg);
 
-    // D2 liquidate-shaped: Argo leg emitting 2 chained calls (transfer + self-call).
+    // D2 settlement-shaped: Argo leg emitting 2 chained calls (one token transfer + one self-call).
+    // This is NOT a liquidation; it is the heaviest instruction shape the M0 spike program has.
     let pay_out = execute(
         elf,
         spike_id(),
@@ -184,7 +185,7 @@ fn s_d_cycle_table() {
         Instruction::Stress { iters: 0, pad: 0 },
     );
     row("D2b Stress iters=0 (baseline)", &base);
-    let mut per_iter = 0f64;
+    let mut per_iter: u64 = 0;
     for iters in [100u32, 1_000, 3_000, 6_000] {
         match try_execute(
             elf,
@@ -195,7 +196,7 @@ fn s_d_cycle_table() {
         ) {
             Ok(r) => {
                 row(&format!("D2b Stress iters={iters}"), &r);
-                per_iter = (r.padded.saturating_sub(base.padded)) as f64 / f64::from(iters);
+                per_iter = r.padded.saturating_sub(base.padded) / u64::from(iters);
             }
             Err(e) => eprintln!(
                 "{:<44} over budget: {e}",
@@ -242,19 +243,27 @@ fn s_d_cycle_table() {
             Err(e) => eprintln!("{:<44} over budget: {e}", format!("D3 Stress pad={pad}B")),
         }
     }
-    let liquidate_chain = pay_out.padded + 2 * token_leg.padded + internal.padded;
-    eprintln!(
-        "{:<44} {liquidate_chain:>12} cycles (sum of legs, future tx-wide budget)",
-        "D2 liquidate-shaped chain total"
-    );
+    // Sum of the legs that actually execute for PayOut: Argo leg + one token Transfer + one self-call.
+    let chain_total = pay_out.padded + token_leg.padded + internal.padded;
+    eprintln!("{:<44} {chain_total:>12} cycles (sum of the three legs; relevant under a future tx-wide budget)", "D2 PayOut chain total");
+    // Extrapolation for a real liquidation (M3 measures it): PayOut-shaped Argo leg + ~40 math iterations
+    // (accrual, health, LIF, seize/repay derivation) + a second token transfer.
+    let liquidation_estimate = pay_out.padded + 40 * per_iter + token_leg.padded;
+    eprintln!("{:<44} {liquidation_estimate:>12} cycles (estimate, not measured: PayOut leg + 40 math iterations + 1 more transfer)", "D2 liquidation extrapolation");
 
-    let verdict = if pay_out.padded < BUDGET / 2 && liquidate_chain < BUDGET {
+    let go =
+        pay_out.padded < BUDGET / 2 && chain_total < BUDGET && liquidation_estimate < BUDGET / 2;
+    let verdict = if go {
         "GO"
     } else if pay_out.padded < BUDGET {
         "PARTIAL"
     } else {
         "NO-GO"
     };
-    eprintln!("VERDICT S-D: {verdict} -- heaviest single leg {} cycles ({:.1}% of 32M); liquidate-shaped chain {} cycles; 50KB account costs {} cycles", pay_out.padded, 100.0 * pay_out.padded as f64 / BUDGET as f64, liquidate_chain, last);
-    assert!(pay_out.padded < BUDGET);
+    eprintln!("VERDICT S-D: {verdict} -- heaviest measured leg {} cycles ({:.1}% of 32M); PayOut chain {} cycles; liquidation extrapolation {} cycles; {} cycles/math-iteration; carrying a 50KB account costs {} cycles", pay_out.padded, 100.0 * pay_out.padded as f64 / BUDGET as f64, chain_total, liquidation_estimate, per_iter, last);
+    assert!(
+        go,
+        "S-D GO condition failed: heaviest leg {} / chain {} / extrapolation {}",
+        pay_out.padded, chain_total, liquidation_estimate
+    );
 }

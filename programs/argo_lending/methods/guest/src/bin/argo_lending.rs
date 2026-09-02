@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_main)]
 
-use nssa_core::account::{AccountId, AccountWithMetadata};
+use nssa_core::account::AccountWithMetadata;
 use spel_framework::context::ProgramContext;
 use spel_framework::prelude::*;
 
@@ -16,7 +16,7 @@ mod argo_lending {
     pub fn initialize(
         ctx: ProgramContext,
         #[account(mut)] config: AccountWithMetadata,
-        admin: AccountId,
+        #[account(mut, signer)] admin: AccountWithMetadata,
     ) -> SpelResult {
         let (posts, calls) = argo_lending_program::initialize(config, admin, ctx.self_program_id);
         Ok(spel_framework::SpelOutput::execute(posts, calls))
