@@ -1,0 +1,14 @@
+[package]
+name = "argo_lending_program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+lee_core.workspace = true
+argo_lending_core.workspace = true
+argo_core.workspace = true
+borsh.workspace = true

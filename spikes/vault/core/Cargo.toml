@@ -1,0 +1,13 @@
+[package]
+name = "spike_vault_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+lee_core.workspace = true
+serde.workspace = true
+borsh.workspace = true

@@ -1,0 +1,14 @@
+[package]
+name = "argo_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Argo shared no_std core: constants, share math, health, LIF, accrual"
+
+[lints]
+workspace = true
+
+[dependencies]
+
+[dev-dependencies]
+proptest.workspace = true

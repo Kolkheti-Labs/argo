@@ -1,0 +1,84 @@
+[workspace]
+members = [
+    "argo_core",
+    "irm_core",
+    "programs/argo_lending/core",
+    "programs/argo_lending",
+    "programs/argo_lending/methods",
+    "spikes/vault/core",
+    "spikes/vault",
+    "spikes/vault/methods",
+    "harness/runner",
+    "spikes/integration_tests",
+    "tools/idl-gen",
+]
+exclude = [
+    "programs/argo_lending/methods/guest",
+    "spikes/vault/methods/guest",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/kolkheti-labs/argo"
+
+[workspace.dependencies]
+# Logos Execution Zone, pinned to the tag the public testnet runs.
+lee_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", features = ["host"] }
+lee = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", features = ["test-utils"] }
+lez_common = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "common" }
+wallet = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "wallet" }
+sequencer_service_rpc = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "sequencer_service_rpc", features = ["client"] }
+# SPEL, pinned to the revision lez-programs builds against (post LEZ v0.2.4 migration).
+spel-framework = { git = "https://github.com/logos-co/spel.git", rev = "1ef0500f8fc8ce3ddf95523726ae159db83f744f", package = "spel-framework" }
+spel-framework-macros = { git = "https://github.com/logos-co/spel.git", rev = "1ef0500f8fc8ce3ddf95523726ae159db83f744f", package = "spel-framework-macros" }
+# Local crates
+argo_core = { path = "argo_core" }
+irm_core = { path = "irm_core" }
+argo_lending_core = { path = "programs/argo_lending/core" }
+argo_lending_program = { path = "programs/argo_lending" }
+programs = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "programs", default-features = false, features = ["artifacts"] }
+testnet_initial_state = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "testnet_initial_state" }
+token_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "token_core" }
+spike_vault_core = { path = "spikes/vault/core" }
+spike_vault_program = { path = "spikes/vault" }
+# Third party
+serde = { version = "1.0", features = ["derive"] }
+borsh = { version = "1.5", features = ["derive"] }
+risc0-zkvm = { version = "=3.0.5" }
+risc0-build = { version = "=3.0.5" }
+serde_json = "1.0"
+tokio = { version = "1.28.2", features = ["net", "rt-multi-thread", "sync", "macros"] }
+proptest = "1.5"
+anyhow = "1.0"
+hex = "0.4"
+
+[workspace.lints.rust]
+rust_2018_idioms = { level = "deny", priority = -1 }
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+correctness = { level = "deny", priority = -1 }
+suspicious = { level = "deny", priority = -1 }
+perf = { level = "deny", priority = -1 }
+style = { level = "warn", priority = -1 }
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+unwrap_used = "deny"
+arithmetic_side_effects = "deny"
+indexing_slicing = "deny"
+as_conversions = "deny"
+cast_possible_truncation = "deny"
+cast_possible_wrap = "deny"
+cast_sign_loss = "deny"
+large_enum_variant = "deny"
+wildcard_enum_match_arm = "deny"
+module_name_repetitions = "allow"
+similar_names = "allow"
+
+[profile.release]
+debug = 0
+strip = "symbols"
