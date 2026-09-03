@@ -1,5 +1,5 @@
 A5 error: ProgramExecutionFailed("Guest panicked: Sender authorization is missing")
-B2 error: InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: DgUeHqYNwAekQCLnHS8x8vBKjaCXyJnLNXvyNMisen4 })
+B2 error: InvalidProgramBehavior(ClaimedUnauthorizedAccount { account_id: <pda> })
 test a1_b1_b3_happy_path_debit_by_seed_and_self_reentry ... ok
 test a5_b4_forged_vault_debit_is_rejected ... ok
 test b2_credit_before_claim_is_rejected_then_init_succeeds ... ok

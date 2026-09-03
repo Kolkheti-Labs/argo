@@ -1,5 +1,5 @@
 A2 error surfaced to the executor: ProgramExecutionFailed("Guest panicked: Internal asked to fail")
-A4 error: InvalidProgramBehavior(InvalidAccountAuthorization { account_id: DgUeHqYNwAekQCLnHS8x8vBKjaCXyJnLNXvyNMisen4 })
+A4 error: InvalidProgramBehavior(InvalidAccountAuthorization { account_id: <pda> })
 A5 error: ProgramExecutionFailed("Guest panicked: Sender authorization is missing")
 A6 error: MaxChainedCallsDepthExceeded
 test a1_b1_b3_happy_path_debit_by_seed_and_self_reentry ... ok
