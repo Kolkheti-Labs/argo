@@ -1,18 +1,18 @@
 == S-D per-execution cycles (spike_vault guest, builtin token) ==
-D1 PayIn: Argo leg                                 238804 cycles   1 seg    0.7% of 32M
-D1 token Transfer leg                              131319 cycles   1 seg    0.4% of 32M
-D2 PayOut: Argo leg (2 chained calls)              270633 cycles   1 seg    0.8% of 32M
-D2 Internal self-call leg                           73657 cycles   1 seg    0.2% of 32M
-D2b Stress iters=0 (baseline)                       71192 cycles   1 seg    0.2% of 32M
-D2b Stress iters=100                               589055 cycles   1 seg    1.8% of 32M
-D2b Stress iters=1000                             5244955 cycles   6 seg   15.6% of 32M
-D2b Stress iters=3000                            15731649 cycles  16 seg   46.9% of 32M
-D2b Stress iters=6000                            31597686 cycles  32 seg   94.2% of 32M
+D1 PayIn: Argo leg                                 239525 cycles   1 seg    0.7% of 32M
+D1 token Transfer leg                              131758 cycles   1 seg    0.4% of 32M
+D2 PayOut: Argo leg (2 chained calls)              271275 cycles   1 seg    0.8% of 32M
+D2 Internal self-call leg                           73582 cycles   1 seg    0.2% of 32M
+D2b Stress iters=0 (baseline)                       71117 cycles   1 seg    0.2% of 32M
+D2b Stress iters=100                               588980 cycles   1 seg    1.8% of 32M
+D2b Stress iters=1000                             5244880 cycles   6 seg   15.6% of 32M
+D2b Stress iters=3000                            15731574 cycles  16 seg   46.9% of 32M
+D2b Stress iters=6000                            31597611 cycles  32 seg   94.2% of 32M
 D2b marginal cost per math iteration                 5254 cycles/iter
 D2c Stress iters=10000                       rejected: Session limit exceeded: 33554432 >= 33554432
-D3 Stress pad=1024B                                544436 cycles   1 seg    1.6% of 32M
-D3 Stress pad=10240B                              4794163 cycles   5 seg   14.3% of 32M
-D3 Stress pad=51200B                             23681843 cycles  24 seg   70.6% of 32M
-D2 PayOut chain total                              475609 cycles (sum of the three legs; relevant under a future tx-wide budget)
-D2 liquidation extrapolation                       612112 cycles (estimate, not measured: PayOut leg + 40 math iterations + 1 more transfer)
-VERDICT S-D: GO -- heaviest measured leg 270633 cycles (0.8% of 32M); PayOut chain 475609 cycles; liquidation extrapolation 612112 cycles; 5254 cycles/math-iteration; carrying a 50KB account costs 23681843 cycles
+D3 Stress pad=1024B                                544361 cycles   1 seg    1.6% of 32M
+D3 Stress pad=10240B                              4794088 cycles   5 seg   14.3% of 32M
+D3 Stress pad=51200B                             23681768 cycles  24 seg   70.6% of 32M
+D2 PayOut chain total                              476615 cycles (sum of the three legs; relevant under a future tx-wide budget)
+D2 liquidation extrapolation                       613193 cycles (estimate, not measured: PayOut leg + 40 math iterations + 1 more transfer)
+VERDICT S-D: GO -- heaviest measured leg 271275 cycles (0.8% of 32M); PayOut chain 476615 cycles; liquidation extrapolation 613193 cycles; 5254 cycles/math-iteration; carrying a 50KB account costs 23681768 cycles
