@@ -88,6 +88,17 @@ from this run differ from the dev-box ids above (`ARGO_LENDING_ID =
 was 271,275 vs 270,633 cycles: the checkout-path dependence documented in
 `docs/m0/riscv32-build.md`, found by this run.
 
+## CI at the submitted head (2026-09-03, commit dd4a9d1)
+
+**GREEN**: https://github.com/Kolkheti-Labs/argo/actions/runs/33726681903. Jobs: `ci-image`; `lint` (fmt, clippy `--locked`);
+`unit` (`--locked` metadata check for all three lockfiles, 7 pure tests,
+both riscv32 guests with `RISC0_BUILD_LOCKED=1`, IDL drift check); `e2e`
+(sequencer + wallet from LEZ v0.2.4 source, harness smoke with `Config.admin`
+equal to the signer, `spikes/run.sh all` exit 0, S-A/S-B captures
+byte-identical, S-D cycle table within tolerance of the committed one, which
+is the clean-host table). The runner's checkout path differs from both
+hetzner2 paths; its cycle counts equal the clean-host run's.
+
 ## CI (GitHub Actions, ubuntu-latest, container from `.github/docker/ci.Dockerfile`)
 
 **GREEN 2026-09-02, PR #1, run https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127**: `ci-image` (10 min), `lint` (fmt +
