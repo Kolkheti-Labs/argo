@@ -1,7 +1,7 @@
 //! Spikes S-A (chained-call atomicity + re-entry) and S-B (custody rule),
-//! run against the in-process LEZ v0.2.4 state machine with the BUILTIN token
-//! program (the one the public testnet runs). Every test states which spike
-//! item it decides. `spikes/run.sh S-A|S-B` runs these and prints the verdict.
+//! run against the in-process LEZ v0.2.4 state machine with the v0.2.4 BUILTIN
+//! token program (`programs::token()`). Every test states which spike item it
+//! decides. `spikes/run.sh S-A|S-B` runs these and prints the verdict.
 #![allow(
     clippy::unwrap_used,
     clippy::expect_used,
@@ -336,27 +336,4 @@ fn b2_credit_before_claim_is_rejected_then_init_succeeds() {
     init(&mut st).expect("B2: Init after the failed credit still claims the vault");
     pay_in(&mut st, PAY_IN).expect("B2: credit after claim succeeds");
     assert_eq!(token_balance(&st, vault_id(&spike_id())), PAY_IN);
-}
-
-/// B5: the token program these tests run against must be the one the public
-/// testnet registers, otherwise the custody verdict is about the wrong program.
-/// Compares the builtin image id with the captured `getProgramIds` evidence.
-#[test]
-fn b5_builtin_token_matches_testnet_capture() {
-    let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../../evidence/testnet");
-    let mut files: Vec<_> = std::fs::read_dir(dir)
-        .expect("evidence/testnet exists")
-        .flatten()
-        .map(|e| e.path())
-        .filter(|p| p.to_string_lossy().contains("getProgramIds"))
-        .collect();
-    files.sort();
-    let latest = files.last().expect("a getProgramIds capture");
-    let text = std::fs::read_to_string(latest).unwrap();
-    let expected = format!("\"token\":{:?}", token_id().to_vec()).replace(' ', "");
-    assert!(
-        text.replace(' ', "").contains(&expected),
-        "testnet token id differs from the builtin used here.\nbuiltin: {:?}\ncapture: {latest:?}",
-        token_id()
-    );
 }

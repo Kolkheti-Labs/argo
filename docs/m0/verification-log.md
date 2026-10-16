@@ -17,7 +17,7 @@ Host: Hetzner CX43, 8 vCPU / 15 GB, Ubuntu, x86_64. Toolchain: rust 1.94.0
 | pure crates | `cargo test -p argo_core -p irm_core` | 7 passed (5 + 2), also green on macOS arm64 |
 | host crates | `cargo check -p spike_vault_program -p argo_lending_program ...` (macOS) | clean after adding `borsh` dep |
 | guest build (D4) | `cargo build --release -p harness_runner` (builds both `*_methods` via `risc0_build::embed_methods`) | OK. `argo_lending` ELF 183,388 B, `spike_vault` ELF 208,868 B |
-| S-A/S-B tests | `cargo test --release -p spike_integration_tests --test spike_ab` | 8 passed (a1–a6, b2, b5), 0 failed (`RISC0_DEV_MODE=1`, real guest ELFs, builtin token program) |
+| S-A/S-B tests | `cargo test --release -p spike_integration_tests --test spike_ab` | 8 passed (a1–a6, b2, b5), 0 failed (`RISC0_DEV_MODE=1`, real guest ELFs, builtin token program). b5 later withdrawn, see the 2026-10-16 entry |
 
 Image ids from this build on the dev box (they change with any guest source,
 lockfile or profile change; the guest lockfiles are committed and CI builds
@@ -71,7 +71,7 @@ A 25-agent adversarial review of the first submission confirmed 15 findings
 failure, S-E evidence ignored by `*.log`, docs describing experiments wider
 than what ran, `Initialize` with an unauthenticated admin, clean-host script
 cloning the bare `main`). After the fixes, on hetzner2 with
-`RISC0_BUILD_LOCKED=1`: `cargo test --locked` 16 passed; clippy `--locked`
+`RISC0_BUILD_LOCKED=1`: `cargo test --locked` 16 passed (incl. b5, withdrawn 2026-10-16); clippy `--locked`
 clean; `./harness/localnet.sh smoke` green with `Config.admin` equal to the
 funder that signed `Initialize`; `./spikes/run.sh all` exit 0 with verdicts
 S-A GO, S-B GO, S-D GO (asserted), S-C NO-GO, S-E PARTIAL; 26 evidence files
@@ -88,7 +88,11 @@ from this run differ from the dev-box ids above (`ARGO_LENDING_ID =
 was 271,275 vs 270,633 cycles: the checkout-path dependence documented in
 `docs/m0/riscv32-build.md`, found by this run.
 
-## CI at the submitted head (2026-09-03, commit dd4a9d1)
+## CI at dd4a9d1 (2026-09-03), the last code commit before the submitted head
+
+The tagged submission head `566fb61` (`m0-submit`) adds only the record of
+this run on top of dd4a9d1; CI is green there too:
+https://github.com/Kolkheti-Labs/argo/actions/runs/33729403009.
 
 **GREEN**: https://github.com/Kolkheti-Labs/argo/actions/runs/33726681903. Jobs: `ci-image`; `lint` (fmt, clippy `--locked`);
 `unit` (`--locked` metadata check for all three lockfiles, 7 pure tests,
@@ -101,7 +105,7 @@ hetzner2 paths; its cycle counts equal the clean-host run's.
 
 ## CI (GitHub Actions, ubuntu-latest, container from `.github/docker/ci.Dockerfile`)
 
-**GREEN 2026-09-02, PR #1, run https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127**: `ci-image` (10 min), `lint` (fmt +
+**GREEN 2026-09-02, PR #1, run https://github.com/Kolkheti-Labs/argo/actions/runs/33674571127 (commit c320a26, before the fix round)**: `ci-image` (10 min), `lint` (fmt +
 clippy under the lez-programs lint set), `unit` (pure crates + both riscv32
 guests + IDL drift check), `e2e-localnet` (sequencer and wallet installed from
 LEZ v0.2.4 source, harness smoke, then all five spike runners). This is the
@@ -129,7 +133,7 @@ Steps and outcomes:
 | `git clone <bundle>` | tree == `522ddda` |
 | `cargo test -p argo_core -p irm_core` | 7 passed |
 | `./harness/localnet.sh smoke` | sequencer + wallet built from source, `argo_lending` deployed as `d9b7db26…`, Config PDA initialised and read back: GREEN |
-| `spikes/run.sh all` | S-A GO (6 tests), S-B GO (4 tests incl. b5 token-id match), S-D GO (heaviest leg 271,395 cycles; 50 KB account 23.68M), S-C NO-GO (8.44 ms/getAccount), S-E landed end to end (E0b rejected at prover) |
+| `spikes/run.sh all` | S-A GO (6 tests), S-B GO (4 tests incl. b5 token-id match; b5 withdrawn 2026-10-16), S-D GO (heaviest leg 271,395 cycles; 50 KB account 23.68M), S-C NO-GO (8.44 ms/getAccount), S-E landed end to end (E0b rejected at prover) |
 
 Cycle counts differ from the dev-box run by <0.5% (different guest image
 from a different toolchain home), which is the expected noise.

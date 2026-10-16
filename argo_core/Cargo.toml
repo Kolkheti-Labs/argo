@@ -3,7 +3,7 @@ name = "argo_core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Argo shared no_std core: constants, share math, health, LIF, accrual"
+description = "Argo shared no_std core: constants and share math (health, LIF and accrual land in M1)"
 
 [lints]
 workspace = true

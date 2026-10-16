@@ -50,7 +50,7 @@ MS=$(python3 -c "print(round(($E-$S)*1000/200,2))")
 echo "C2 getAccount mean latency: ${MS} ms/call (200 calls, localhost)"
 
 if [ -z "$EVENTKEYS" ]; then
-  echo "VERDICT S-C: NO-GO -- getTransaction returns only (submitted tx, block id), no receipt/event object (top-level keys: $(sed -n 's/^ALLKEYS=//p' <<<"$KEYS")); observation layer = PDA polling (${MS} ms per getAccount, localhost); switch to getEvents when a LEZ tag ships PR 705/707"
+  echo "VERDICT S-C: NO-GO -- getTransaction returns only (submitted tx, block id), no receipt/event object (top-level keys: $(sed -n 's/^ALLKEYS=//p' <<<"$KEYS")); observation layer = PDA polling (${MS} ms per getAccount, localhost); switch to getEvents on a LEZ version that has it (v0.2.5-rc1 and v0.3.0 ship PR 705/707/713; v0.2.4 does not)"
 else
   echo "VERDICT S-C: GO -- event-ish keys present: $EVENTKEYS"
 fi

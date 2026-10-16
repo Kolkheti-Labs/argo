@@ -9,7 +9,7 @@
 # when its measurements ran to completion and its decisive assertions held
 # (a designed NO-GO such as S-C is exit 0; a compile error, a failed test, a
 # transaction that never landed, or a verdict contradicting the observation
-# is non-zero and fails CI). docs/m0/verdicts.md quotes the lines verbatim.
+# is non-zero and fails CI). docs/m0/verdicts.md records each verdict and its consequence.
 set -euo pipefail
 
 R="$(cd "$(dirname "$0")/.." && pwd)"

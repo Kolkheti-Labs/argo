@@ -71,7 +71,8 @@ cargo test --locked -p spike_integration_tests        # S-A, S-B, S-D (in-proces
 ./harness/clean-host.sh <repo-url-or-bundle> <empty-dir> <commit>   # the same from empty toolchain homes
 ```
 
-The harness never touches the public testnet. It honours `CARGO_TARGET_DIR`,
+Apart from the read-only `harness/probe-testnet-token.sh`, which CI does not
+run, the harness never touches the public testnet. It honours `CARGO_TARGET_DIR`,
 `ARGO_PORT` (default 3048) and `RISC0_DEV_MODE` (default 1).
 
 ## Licence

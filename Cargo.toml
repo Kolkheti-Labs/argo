@@ -25,7 +25,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/kolkheti-labs/argo"
 
 [workspace.dependencies]
-# Logos Execution Zone, pinned to the tag the public testnet runs.
+# Logos Execution Zone, pinned to tag v0.2.4 (the version M0 targets).
 lee_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", features = ["host"] }
 lee = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", features = ["test-utils"] }
 lez_common = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "common" }

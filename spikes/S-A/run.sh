@@ -13,7 +13,7 @@ rc=${PIPESTATUS[0]}
 # Committed evidence: the test list and results (stable across runs), not timings.
 grep -E "^test |^test result|^A[0-9] error" "$R/.spike-S-A.log" | sed -E 's/ finished in [0-9.]+s//' | sed -E 's/account_id: [1-9A-HJ-NP-Za-km-z]{32,44}/account_id: <pda>/g' | sort > "$EV/S-A.run.txt"
 if [ "$rc" -eq 0 ]; then
-  echo "VERDICT S-A: GO -- a1..a6 green: a failing last leg reverted the state write and the token transfer; self re-entry works and a top-level call into the internal entrypoint is rejected; wrong PDA seed, signer-less top-level debit, and an 11-call chain are rejected with the expected runtime errors"
+  echo "VERDICT S-A: GO -- a1..a6 green: a failing last leg reverted the state write and the token transfer; self re-entry works and a top-level call into the internal entrypoint is rejected; wrong PDA seed, a top-level debit the vault did not authorise, and an 11-call chain are rejected with the expected errors"
 else
   echo "VERDICT S-A: NO-GO -- tests failed or did not run (exit $rc), see .spike-S-A.log"
 fi

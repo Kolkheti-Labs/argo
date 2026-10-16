@@ -12,7 +12,7 @@ writes applied" or "a program cannot chain into itself / be chained back into".
 - `ChainedCall { program_id, pre_states, instruction_data, pda_seeds }`,
   `ChainedCall::new(program_id, pre_states, &instruction)` encodes with risc0
   serde of the callee's `Instruction` enum. `MAX_NUMBER_CHAINED_CALLS = 10`.
-  (`lez/lee/state_machine/core/src/program/mod.rs`)
+  (`lee/state_machine/core/src/program/mod.rs:14`)
 - Execution is depth-first in declared order; each execution has its own
   32M-cycle session. The whole tx builds one `ValidatedStateDiff`; any error
   or panic anywhere in the chain returns `Err` and nothing is applied.
@@ -66,7 +66,7 @@ Runs on the standalone sequencer at `RISC0_DEV_MODE=1`:
 - A3 re-entry: `Internal` reached through the chain succeeds; `Internal`
   submitted top-level (caller = default id) is rejected.
 - A4 wrong seed: `PayOut` with a wrong `pda_seeds` entry is rejected.
-- A5 signer-less debit: a top-level user-signed token `Transfer` with the
+- A5 unauthorised debit (the vault does not sign): a top-level user-signed token `Transfer` with the
   vault as sender → rejected by the token program (`Sender authorization is
   missing`). A second *program* chaining a Transfer with the vault marked
   authorised was NOT built in M0; the runtime check it would hit is the same

@@ -8,20 +8,23 @@ size do to that margin?
 ## What the source says
 - `MAX_NUM_CYCLES_PUBLIC_EXECUTION = 32 * 1024 * 1024` (32M cycles) applied
   as `session_limit` per program execution, so each chained call gets its own
-  32M (`lez/lee/state_machine/src/program/mod.rs`). Comment says it becomes
+  32M (`lee/state_machine/src/program/mod.rs:13-15,63`). Comment says it becomes
   variable "when fees are implemented".
 - Account size drives cost: lez-programs' benchmark notes ~33M extra cycles for
   a program-owned 100 KB account (paging/hashing). `DATA_MAX_LENGTH` is
   100 KiB. Keep every Argo account small.
 - Other limits: 10 chained calls (public path allows 11 executions, private
   path 10), block 1 MiB, RPC body 10 MiB, no cap on accounts per tx (open
-  issue 622). No fee, no `Message.fee` field.
+  issue 622). v0.2.4 has no fee and no `Message.fee` field.
 - Upstream baselines (`docs/benchmarks/cycle_bench.md`): token Transfer
   127,726 cycles; AMM SwapExactInput 508,904; AddLiquidity 643,464; proving
   ≈100 µs/cycle po2-padded on an M2 Pro; ≈53 s per extra chained call.
-- Upstream fee PR 801 (open) meters cycles with a budget shared across the
-  WHOLE chain, not per leg. Argo's M3 benchmark must report both the per-leg
-  max (v0.2.4 rule) and the chain total (future rule).
+- Upstream fees (PR 801: open on `dev` when this spike was written on
+  2026-09-02; merged 2026-09-03, in v0.2.5-rc1 and v0.3.0, not in v0.2.4).
+  In v0.3.0 one cycle budget is shared by every call in the chain, not per
+  leg (`lee/state_machine/src/validated_state_diff/mod.rs:95-97`). Argo's M3
+  benchmark must report both the per-leg max (v0.2.4 rule) and the chain
+  total (later rule).
 - LP-0002 measured on v0.2.4: a small guest ~1M cycles; the outer privacy
   circuit 4.7–5.2M cycles and >6 GB RAM to prove. Public txs are proven by
   the sequencer, private ones client-side.

@@ -8,4 +8,4 @@ test a3_internal_is_rejected_at_top_level ... ok
 test a4_wrong_pda_seed_is_rejected ... ok
 test a5_b4_forged_vault_debit_is_rejected ... ok
 test a6_chain_length_limit_is_ten ... ok
-test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out;
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out;

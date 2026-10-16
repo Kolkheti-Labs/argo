@@ -28,14 +28,17 @@ following only `README.md`. The host, commit hash, and full log are recorded in
 
 ## Evidence rule
 
-The LEZ testnet is wiped and redeployed periodically, which orphans program ids
+LEZ testnets get reset (Logos reported a reset on Discord on 2026-10-10), which orphans program ids
 and transaction hashes. Any claim that references chain state must be backed by
 a raw JSON-RPC response committed under `evidence/`, captured by
 the spike script that made the claim, and regenerable by rerunning that script.
-Local-sequencer captures carry fresh block numbers and hashes on every run, so
-what is byte-stable across runs is the test lists and the cycle table
-(`evidence/localnet/S-A.run.txt`, `S-B.run.txt`, `S-D.run.txt`, checked in
-CI); the per-tx payloads are re-captured, not byte-compared. M0 spikes run
+Local-sequencer captures carry fresh block numbers and hashes on every run.
+What is byte-stable across runs is the S-A/S-B test lists
+(`evidence/localnet/S-A.run.txt`, `S-B.run.txt`), which CI compares byte for
+byte. The S-D cycle table (`S-D.run.txt`) depends on the checkout path through
+the guest image, so CI compares it within tolerance
+(`harness/compare-cycles.py`); the per-tx payloads are re-captured, not
+compared. M0 spikes run
 on the local standalone sequencer, so this rule mostly matters from M1 on, but
 the tooling ships in M0.
 

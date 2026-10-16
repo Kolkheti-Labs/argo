@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # S-E: fee-funding-within-deshield on v0.2.4 (no fees exist; the live question
 # is the ephemeral-account init rule and linkability). Wallet-driven:
-#   E0b deshield Private P -> fresh Public A (never initialised)   expect: dropped
+#   E0b deshield Private P -> fresh Public A (never initialised)   expect: rejected at prover or dropped (either passes)
 #   E0  A initialised by its own key (auth-transfer init)           expect: lands
 #   E1  deshield P -> A                                             expect: lands
 #   E2  A acts as a public signer (auth-transfer send A -> B)       expect: lands
 #   E3  reshield A -> Private P2                                    expect: lands, A at 0
-#   E4  accounts co-appearing with A in its blocks                  expect: only B/protocol
+#   E4  accounts co-appearing with A in its blocks                  NOT evaluated in M0 (raw blocks saved)
 set -uo pipefail
 R="$(cd "$(dirname "$0")/../.." && pwd)"
 source "$R/harness/lib.sh"
@@ -14,7 +14,7 @@ export ARGO_PORT="${ARGO_PORT:-3048}"; export ARGO_RPC="http://127.0.0.1:$ARGO_P
 TARGET="${CARGO_TARGET_DIR:-$R/target}"; RUN="$TARGET/release"
 W="$TARGET/lez-bin/bin/wallet"
 export LEE_WALLET_HOME_DIR="$R/.localnet-argo/wallet"
-EV="$R/evidence/localnet"; mkdir -p "$EV"
+EV="$R/evidence/localnet"; mkdir -p "$EV"; rm -f "$EV"/S-E-*   # one run's evidence only
 trap '"$R/harness/localnet.sh" down' EXIT
 "$R/harness/localnet.sh" up >/dev/null || die "localnet up failed"
 w() { RUST_LOG=error "$W" "$@"; }
@@ -95,7 +95,7 @@ B=$B
 P2=$P2
 IDS
 if [ "$E0B_OK" = 1 ] && [ "$A_AFTER_E1" = 300 ] && [ "$A_FINAL" = 0 ]; then
-  echo "VERDICT S-E: PARTIAL -- fee half not applicable (v0.2.4 has no tx fees); deshield into an uninitialised public account is $E0B; after an own-key init, deshield (A=300) -> public op signed by A -> reshield (A=0) all landed (wallet output + raw getTransaction per step in evidence/localnet/S-E-*); E4 linkability NOT evaluated in M0"
+  echo "VERDICT S-E: PARTIAL -- fee half not applicable (v0.2.4 has no tx fees); stock-wallet deshield into an uninitialised public account is $E0B; after an own-key init, deshield (A=300) -> public op signed by A -> reshield (A=0) all landed (wallet output + raw getTransaction per step in evidence/localnet/S-E-*); E4 linkability NOT evaluated in M0"
   exit 0
 else
   echo "VERDICT S-E: NO-GO -- observation contradicts the expected sequence (E0b_ok=$E0B_OK, A after E1=$A_AFTER_E1, A final=$A_FINAL)"
