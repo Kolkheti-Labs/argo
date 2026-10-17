@@ -88,14 +88,11 @@ of 2026-10-12 (Discord).
      open.
 3. **S-E E5 notes.** Added to `docs/m0/spikes/S-E-fee-within-deshield.md`.
 4. **Re-run on 0.3.** Replaced by the 2026-10-12 guidance, so not done. After
-   removing b5, all five spikes were re-run on v0.2.4 on hetzner2
-   (verification log, 2026-10-16).
+   removing b5, all five spikes were re-run on v0.2.4 on hetzner2 at
+   `134d353` (verification log, 2026-10-17).
 5. **0.4 adaptation.** Not started, since 0.4 is not published. Spec §7 item 7
    lists what we re-check when it ships. Milestone impact follows once Logos
    publishes the 0.4 dates.
-6. **Is the M0 PR up to date?** Yes. This round is on PR #1, whose description
-   names the new head commit and its CI run. The original submission stays
-   tagged `m0-submit` (`566fb61`).
 
 The spike corrections made in this round are listed in `docs/m0/verdicts.md`
 ("Corrections").

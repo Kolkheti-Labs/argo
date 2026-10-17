@@ -17,7 +17,7 @@ Host: Hetzner CX43, 8 vCPU / 15 GB, Ubuntu, x86_64. Toolchain: rust 1.94.0
 | pure crates | `cargo test -p argo_core -p irm_core` | 7 passed (5 + 2), also green on macOS arm64 |
 | host crates | `cargo check -p spike_vault_program -p argo_lending_program ...` (macOS) | clean after adding `borsh` dep |
 | guest build (D4) | `cargo build --release -p harness_runner` (builds both `*_methods` via `risc0_build::embed_methods`) | OK. `argo_lending` ELF 183,388 B, `spike_vault` ELF 208,868 B |
-| S-A/S-B tests | `cargo test --release -p spike_integration_tests --test spike_ab` | 8 passed (a1–a6, b2, b5), 0 failed (`RISC0_DEV_MODE=1`, real guest ELFs, builtin token program). b5 later withdrawn, see the 2026-10-16 entry |
+| S-A/S-B tests | `cargo test --release -p spike_integration_tests --test spike_ab` | 8 passed (a1–a6, b2, b5), 0 failed (`RISC0_DEV_MODE=1`, real guest ELFs, builtin token program). b5 later withdrawn, see the review round 1 re-run entry (2026-10-17) |
 
 Image ids from this build on the dev box (they change with any guest source,
 lockfile or profile change; the guest lockfiles are committed and CI builds
@@ -140,3 +140,35 @@ from a different toolchain home), which is the expected noise.
 
 Still not the final clean host: same kernel and apt packages as the dev box.
 The acceptance gate's last row needs one run on a box that never built Argo.
+
+## Review round 1 re-run (2026-10-17, hetzner2 development box, commit 134d353)
+
+Same host and toolchain as the 2026-09-02 development-box entry (rust 1.94.0
+via `rust-toolchain.toml`; rzup rust 1.94.1, r0vm 3.0.5, cargo-risczero 3.0.5). Tree: `git clone` of a bundle at `134d353` into a
+fresh directory, not an rsync of a working copy. Env:
+`/mnt/HC_Volume_105321168/argo-env.sh` with `RISC0_DEV_MODE=1` and
+`RISC0_BUILD_LOCKED=1`; the target directory is shared with earlier runs, so
+builds were incremental. One log per step; every step exited 0. The raw logs
+stay on the build host (`/mnt/HC_Volume_105321168/argo-r2-logs`); hand-selected lines (step exit codes, test results,
+verdict lines, the capture comparison) are committed in
+`evidence/runs/2026-10-17-134d353.txt`. This is not a GitHub CI run.
+
+| Step | Command | Outcome |
+| --- | --- | --- |
+| fmt | `cargo fmt --all -- --check` | clean |
+| clippy | `RISC0_SKIP_BUILD=1 cargo clippy --locked --workspace --all-targets -- -D warnings` | clean |
+| lockfiles | `cargo metadata --locked` for the root and both guest workspaces | current |
+| pure crates | `cargo test --locked -p argo_core -p irm_core` | 7 passed (5 + 2) |
+| guest builds | `cargo build --locked --release -p argo_lending_methods -p spike_vault_methods` | OK |
+| IDL | `./harness/gen-idl.sh && git diff --exit-code -- idl/` | no drift |
+| harness smoke | `./harness/localnet.sh smoke` | GREEN, with `Config.admin` equal to the signer (the script fails otherwise) |
+| spikes | `./spikes/run.sh all` | S-A GO (a1–a6), S-B GO (3 tests), S-D GO (heaviest leg 271,305 cycles; 50 KB account 23,681,783), S-C NO-GO (9.32 ms per `getAccount`), S-E PARTIAL (stock-wallet E0b rejected at the prover; E0–E3 landed) |
+| captures | `git diff --exit-code` on `S-A.run.txt` and `S-B.run.txt`; `harness/compare-cycles.py` on `S-D.run.txt` | S-A/S-B byte-identical to the committed files; cycle table matches (15 rows, worst drift 0.021%) |
+| all tests | `cargo test --locked --release --workspace` | 15 passed: 7 pure, 7 `spike_ab`, 1 `spike_d` |
+
+b5 is withdrawn, so `spike_ab` now has 7 tests and the workspace 15 (it was
+16). The committed S-C, S-D and S-E captures are still those of the
+2026-09-02 run: this re-run regenerated them in its own checkout, and only
+S-A/S-B (byte for byte) and the S-D cycle table (within tolerance) are
+compared. A run on 2026-10-16 at an earlier version of this round's commit
+(`553d90a`) is not counted: part of its log was overwritten.
