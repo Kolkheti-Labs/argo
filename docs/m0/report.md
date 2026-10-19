@@ -12,7 +12,7 @@ https://github.com/logos-co/rfp/issues/170.
 | D2 | SPEL scaffolding | `argo_core/`, `irm_core/`, `programs/argo_lending/`, `spikes/vault/` | guests build, `docs/m0/verification-log.md` |
 | D3 | Standalone-sequencer harness | `harness/` | smoke green on dev box and from a fresh toolchain (verification log) |
 | D4 | ring/riscv32 build | `docs/m0/riscv32-build.md` | guest ELFs built from a fresh toolchain home (verification log) |
-| D5 | Sharding + state-layout spec | `docs/spec/state-layout.md` | review by rekt, adp, then with Logos on the tracker: _pending_ |
+| D5 | Sharding + state-layout spec | `docs/spec/state-layout.md` | review by rekt, adp, then with Logos on the tracker: adp reviewed 2026-10-19 at `2beec8c` (https://github.com/Kolkheti-Labs/argo/pull/1#issuecomment-6265447369), addressed in the spec; rekt, a review of the new material, and Logos _pending_ |
 | D6 | Go/no-go spikes | `docs/m0/verdicts.md`, `spikes/`, `evidence/` | S-A GO, S-B GO, S-C NO-GO (polling), S-D GO, S-E PARTIAL (init step established for the stock v0.2.4 wallet deshield; linkability not evaluated) |
 
 ## What the spikes changed in the M1–M3 design
@@ -66,8 +66,11 @@ https://github.com/logos-co/rfp/issues/170.
   Logos.
 - Clock: rekt's review of spec §5, and a live check of `CLOCK_01` on the
   relaunched 0.2 testnet.
-- `Authorization` as its own PDA vs inside `Position`; protocol fee placement
-  (spec §7).
+- Protocol fee placement (spec §7 item 5). `Authorization` is decided: its
+  own PDA (spec §7 item 1, adp).
+- The design questions added on 2026-10-19 (spec §7 items 8–13): ATA
+  support, Morpho callbacks and flash-loan predictions, `loan_token ==
+  collateral_token`, initial admin, the klend proposals, and IRMs.
 - S-E re-run (E0b, E1–E3, E5) on the LEZ version Argo ships on.
 
 ## Review response (2026-10-16)
@@ -78,6 +81,17 @@ of 2026-10-12 (Discord).
 1. **Spec review.** Not yet. The spec was written by jeefxM, and no review by
    rekt or adp is recorded yet. They review it next on PR #1, then the review
    with Logos follows, so D5 stays open.
+   Update 2026-10-19:
+   - adp reviewed §2, §3, §4, §6, §7.1 and §7.6 at `2beec8c` on PR #1
+     (https://github.com/Kolkheti-Labs/argo/pull/1#issuecomment-6265447369).
+   - The working spec addresses adp's six change requests (two with
+     corrections) and records adp's two decisions.
+   - Everything that differs from `2beec8c` postdates adp's review and is
+     not yet reviewed. That includes issues found in the v0.2.4 source (the
+     main ones marked "(found 2026-10-19)") and proposals taken from Kamino
+     klend (§7 items 2, 5, 11 and 12).
+   - Pending: rekt's review of §5 and §7 items 2–5, a review of the new
+     material, then Logos. D5 stays open.
 2. **Clock source, LEZ version, token program.**
    - Version: M1 builds on LEZ v0.2.4 and the deliverable targets 0.4, as
      Logos asked on 2026-10-12. No 0.3 port (spec, "Target runtime").

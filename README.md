@@ -43,7 +43,9 @@ docs/spec/                     account-sharding + state-layout spec (draft for r
 ```
 
 Later milestones add `app/core`, `app/cli`, `app/gui`, `services/liquidator`,
-`services/risk_monitor`, and the standalone `argo_irm` program.
+`services/risk_monitor`, and further IRM models (proposed: compiled into
+`argo_lending`, because LEZ v0.2.4 has no return value from a chained call;
+see `docs/spec/state-layout.md` §3 and §7 item 13).
 
 ## Prerequisites
 
