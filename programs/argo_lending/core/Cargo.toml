@@ -1,0 +1,15 @@
+[package]
+name = "argo_lending_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Argo lending program: Instruction enum, account layouts, PDA seeds (M0 placeholder)"
+
+[lints]
+workspace = true
+
+[dependencies]
+lee_core.workspace = true
+argo_core.workspace = true
+serde.workspace = true
+borsh.workspace = true

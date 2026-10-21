@@ -1,0 +1,24 @@
+[package]
+name = "argo_lending_guest"
+version = "0.0.1"
+edition = "2021"
+
+[workspace]
+
+[profile.release]
+debug = 0
+strip = "symbols"
+
+[[bin]]
+name = "argo_lending"
+path = "src/bin/argo_lending.rs"
+
+[dependencies]
+spel-framework = { git = "https://github.com/logos-co/spel.git", rev = "1ef0500f8fc8ce3ddf95523726ae159db83f744f", package = "spel-framework" }
+nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee_core" }
+risc0-zkvm = { version = "=3.0.5", default-features = false }
+ruint = { version = "=1.17.0", default-features = false }
+argo_lending_core = { path = "../../core" }
+argo_lending_program = { path = "../.." }
+serde = { version = "1.0", features = ["derive"] }
+borsh = "1.5"

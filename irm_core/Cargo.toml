@@ -1,0 +1,15 @@
+[package]
+name = "irm_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "AdaptiveCurveIRM math, no_std, deterministic; linked into the guest and compiled standalone"
+
+[lints]
+workspace = true
+
+[dependencies]
+argo_core.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true

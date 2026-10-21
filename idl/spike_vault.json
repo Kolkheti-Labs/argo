@@ -1,0 +1,152 @@
+{
+  "version": "0.1.0",
+  "name": "spike_vault",
+  "instructions": [
+    {
+      "name": "init",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "token_definition",
+          "writable": false,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "pay_in",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "user_holding",
+          "writable": true,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "pay_out",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "recipient",
+          "writable": true,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u128"
+        },
+        {
+          "name": "then_fail",
+          "type": "bool"
+        },
+        {
+          "name": "wrong_seed",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "fanout",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "n",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "stress",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "iters",
+          "type": "u32"
+        },
+        {
+          "name": "pad",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "internal",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "must_fail",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "instruction_type": "spike_vault_core::Instruction"
+}
