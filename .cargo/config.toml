@@ -1,0 +1,4 @@
+[env]
+# Keep cc-rs from injecting macOS flags into the RISC-V cross-compiler when
+# building C deps for the guest target (fails on macOS 26+ otherwise).
+CFLAGS_riscv32im_risc0_zkvm_elf = "-march=rv32im -nostdlib"

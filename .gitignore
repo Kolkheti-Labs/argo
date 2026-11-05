@@ -8,3 +8,5 @@ storage.json
 wallet_home/
 .env
 .DS_Store
+!evidence/**
+tasks/

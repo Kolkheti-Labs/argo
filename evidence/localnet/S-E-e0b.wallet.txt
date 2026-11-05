@@ -1,0 +1,11 @@
+WARNING: proving in dev mode. This will not generate valid, secure proofs.
+WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+WARNING: proving in dev mode. This will not generate valid, secure proofs.
+
+thread 'main' (1) panicked at lee/privacy_preserving_circuit/src/execution_state.rs:402:29:
+Cannot claim unauthorized account 436TQSMAPcyddcKj8HH7HmaeByMkyxMacd8CU4hhbqiW
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Error: Failed to build transaction: Circuit proving error
+
+Caused by:
+    Circuit proving error

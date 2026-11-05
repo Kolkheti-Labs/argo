@@ -1,0 +1,90 @@
+# Review round 1 re-run on hetzner2 (development box) at commit 134d353: hand-selected lines from
+# the per-step logs. This is not a GitHub CI run. A script outside the repo ran the lint, unit and
+# e2e steps of the GitHub CI workflow on the host, outside CI's Docker image (`cargo test` in
+# place of `cargo nextest` for the pure crates), plus `cargo test --locked --release --workspace`,
+# writing one log per step; the raw logs stay on the build host (hetzner2,
+# /mnt/HC_Volume_105321168/argo-r2-logs).
+# Selected lines are copied verbatim, except that host paths are removed from the alltests
+# "Running" lines, NUL padding bytes before the smoke line are dropped, and the duplicated S-D
+# verdict line is shown once. Everything else is omitted,
+# including the fmt, clippy, lockfiles, guests and idl logs, which appear only as exit codes.
+
+## summary.txt (step exit codes)
+commit 134d353632bd4f52b46b219ed3c0a793909eaab9 start 2026-10-17T12:30:34Z
+fmt RC=0 12:30:34Z
+clippy RC=0 12:30:42Z
+lockfiles RC=0 12:30:44Z
+pure RC=0 12:30:45Z
+guests RC=0 12:30:50Z
+idl RC=0 12:30:54Z
+smoke RC=0 12:31:19Z
+spikes RC=0 12:34:51Z
+captures RC=0 12:34:51Z
+alltests RC=0 12:35:05Z
+done 2026-10-17T12:35:05Z
+
+## pure.log: test results
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+## smoke.log: result
+=== ARGO LOCALNET SMOKE GREEN (program eb139fbba604bbb9611f6570b12c4d11571c1d37e38fe7399f479cfdb1f78fc2) ===
+
+## spikes.log: verdicts and S-C latency
+VERDICT S-A: GO -- a1..a6 green: a failing last leg reverted the state write and the token transfer; self re-entry works and a top-level call into the internal entrypoint is rejected; wrong PDA seed, a top-level debit the vault did not authorise, and an 11-call chain are rejected with the expected errors
+VERDICT S-B: GO -- anyone credits a claimed vault; only the program debits it (by seed); credit before claim is rejected (ClaimedUnauthorizedAccount) so create_market claims first
+VERDICT S-D: GO -- heaviest measured leg 271305 cycles (0.8% of 32M); PayOut chain 476660 cycles; liquidation extrapolation 613223 cycles; 5254 cycles/math-iteration; carrying a 50KB account costs 23681783 cycles
+C2 getAccount mean latency: 9.32 ms/call (200 calls, localhost)
+VERDICT S-C: NO-GO -- getTransaction returns only (submitted tx, block id), no receipt/event object (top-level keys: id,jsonrpc,result); observation layer = PDA polling (9.32 ms per getAccount, localhost); switch to getEvents on a LEZ version that has it (v0.2.5-rc1 and v0.3.0 ship PR 705/707/713; v0.2.4 does not)
+VERDICT S-E: PARTIAL -- fee half not applicable (v0.2.4 has no tx fees); stock-wallet deshield into an uninitialised public account is rejected by wallet/prover; after an own-key init, deshield (A=300) -> public op signed by A -> reshield (A=0) all landed (wallet output + raw getTransaction per step in evidence/localnet/S-E-*); E4 linkability NOT evaluated in M0
+
+## captures.log
+cycle table matches (15 rows, worst drift 0.021%, verdict 'VERDICT S-D: GO')
+
+## alltests.log: test binaries and results
+     Running unittests src/lib.rs 
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/argo_deploy.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/argo_initialize.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/argo_read_config.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/argo_setup_funder.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/main.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/spike_ab.rs 
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.06s
+     Running tests/spike_d.rs 
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.89s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs 
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
