@@ -1,0 +1,17 @@
+[package]
+name = "argo_integration_tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "M1: argo_lending against the in-process LEZ v0.2.4 state machine and the pinned lez-programs v2.0.1 token (RISC0_DEV_MODE=1)"
+
+[lints]
+workspace = true
+
+[dependencies]
+lee.workspace = true
+lee_core = { workspace = true, features = ["test_utils"] }
+argo_core.workspace = true
+argo_lending_core.workspace = true
+argo_lending_methods = { path = "../methods" }
+borsh.workspace = true

@@ -47,6 +47,7 @@ dependencies = [
  "borsh",
  "lee_core",
  "serde",
+ "sha2",
 ]
 
 [[package]]

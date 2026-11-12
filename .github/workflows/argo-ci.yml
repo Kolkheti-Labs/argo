@@ -3,7 +3,7 @@ name: Argo CI
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, m1]
   pull_request:
 
 permissions:
@@ -59,11 +59,13 @@ jobs:
           cargo metadata --locked --format-version 1 --manifest-path programs/argo_lending/methods/guest/Cargo.toml >/dev/null
           cargo metadata --locked --format-version 1 --manifest-path spikes/vault/methods/guest/Cargo.toml >/dev/null
       - name: pure crates (host)
-        run: cargo nextest run --locked -p argo_core -p irm_core
+        run: cargo nextest run --locked -p argo_core -p irm_core -p argo_lending_core -p argo_lending_program
       - name: guest builds for riscv32 (guest lockfiles enforced via RISC0_BUILD_LOCKED)
         run: cargo build --locked --release -p argo_lending_methods -p spike_vault_methods
       - name: IDL is up to date
         run: ./harness/gen-idl.sh && git diff --exit-code -- idl/
+      - name: M1 core operations against the in-process state machine (pinned v2.0.1 token)
+        run: RISC0_DEV_MODE=1 cargo nextest run --locked --release -p argo_integration_tests
 
   # Full loop against a locally booted STANDALONE sequencer. Never touches the
   # public testnet. RISC0_DEV_MODE=1 so CI finishes in minutes; real proofs are
@@ -84,6 +86,8 @@ jobs:
       - uses: actions/checkout@v5
       - name: harness smoke (boot sequencer, deploy placeholder, read back)
         run: ./harness/localnet.sh smoke
+      - name: M1 done gate (all six operations, plus a rejected over-LLTV borrow and a rejected unhealthy collateral withdrawal, on the standalone sequencer)
+        run: ./harness/localnet.sh e2e
       - name: spikes (all five; a spike that fails to run or whose decisive tests fail exits non-zero)
         run: ./spikes/run.sh all
       - name: committed spike captures match this run (test lists byte-identical; cycle table within 0.5%, see docs/m0/riscv32-build.md)
