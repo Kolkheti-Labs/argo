@@ -8,7 +8,8 @@ calls.
 
 Built by Kolkheti Labs under Logos RFP-008
 (https://github.com/logos-co/rfp/issues/141). Status: **M1, core market
-primitives, in progress** (tracker: https://github.com/logos-co/rfp/issues/171;
+primitives: part 1 done on branch `m1`, part 2 (adp) to follow**, see
+`docs/m1/README.md` (tracker: https://github.com/logos-co/rfp/issues/171;
 M0: https://github.com/logos-co/rfp/issues/170, code merged to `main` in PR #1). Nothing here is
 deployed and nothing custodies value. The M1 build pins a public test admin key
 (`ADMIN_GENESIS`, `docs/m1/decisions.md` D14) and must not be deployed to a
@@ -46,7 +47,7 @@ tools/idl-gen/                 SPEL IDL generator (vendored); idl/ holds the gen
 evidence/                      raw JSON-RPC captures and spike run outputs referenced by docs/m0/verdicts.md
 docs/m0/                       acceptance gate, spike plan and per-spike docs, verdicts, verification log, milestone report
 docs/spec/                     account-sharding + state-layout spec (reviewed in M0, tag m0-r1)
-docs/m1/                       M1 decisions that differ from the spec, and the requirement -> test table
+docs/m1/                       M1 summary (README), decisions that differ from the spec, and the requirement -> test table
 ```
 
 Later milestones add `app/core`, `app/cli`, `app/gui`, `services/liquidator`,
