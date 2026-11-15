@@ -7,13 +7,15 @@ Where a source says Logos, it is the RFP-008 Discord thread unless a link is giv
 Pins: LEZ `v0.2.4` (47eba256), SPEL rev `1ef0500f` (upgrade to v0.7.0 deferred to M2, where the RFP-001 admin
 library needs it).
 
-## Needs Logos input
+## For M4
 
-1. The rule for choosing `max_age_ms` (D5, see
-   [below](#d5-and-f11-why-the-core-checks-staleness-and-how-to-choose-max_age_ms)), and how often each testnet
-   price feed updates, so we can set defaults.
-2. Whether a price account could carry its source's observation time, so the maximum-age check also works for TWAP
-   feeds (see "What the bound measures" below).
+Neither of these blocks M1.
+
+1. Per-feed `max_age_ms` defaults. The rule for choosing the value is
+   [below](#d5-and-f11-why-the-core-checks-staleness-and-how-to-choose-max_age_ms) (D5). The values depend on how
+   often each testnet price feed updates.
+2. TWAP feeds. The maximum-age check would also work for them if a price account carried its source's observation
+   time (see "What the bound measures" below).
 
 ## Summary
 
@@ -277,8 +279,8 @@ longer:
 
 The value is fixed per market at creation and is part of the market id (D2), so lenders judge it with the oracle.
 Concrete values per feed are set when M4 wires real feeds. In-process tests use a mock-owned price account; the
-sequencer e2e uses a `twap_oracle` v2.0.1 price account. This section is our proposal and still needs Logos's
-review.
+sequencer e2e uses a `twap_oracle` v2.0.1 price account. Logos (sasha) accepted the check and asked for this
+justification (D5). The rule for choosing the value is ours.
 
 ## Not implemented from the M0 spec
 
@@ -305,4 +307,4 @@ review.
   holding; a key that has already signed while unowned can never become one, D14) can be supplied to, but its
   owner cannot withdraw, borrow or withdraw collateral until M3.
 - RFP-008 F11 asks for an LLTV *removal* function on testnet; M1 has `enable_lltv` only (admin scope is M2).
-- TWAP feeds and staleness: see "What the bound measures" above; the question to Logos is open.
+- TWAP feeds and staleness: see "What the bound measures" above; this is for M4.

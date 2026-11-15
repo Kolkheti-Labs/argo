@@ -7,8 +7,8 @@ the submission will name the exact commit to review.
 Part 1 is Argo's lending program on LEZ v0.2.4: one program that holds every market, permissionless market
 creation, and the six core operations (`supply`, `withdraw`, `supply_collateral`, `withdraw_collateral`,
 `borrow`, `repay`). Tokens move by chained calls to the lez-programs v2.0.1 token program, a health check caps
-borrowing and collateral withdrawals, and supply and debt are tracked in virtual shares. Nothing is deployed: it runs in tests and on a local
-standalone sequencer.
+borrowing and collateral withdrawals, and supply and debt are tracked in virtual shares. Nothing is deployed. It
+runs in tests and on a local standalone sequencer.
 
 ## The eight deliverables
 
@@ -67,10 +67,12 @@ Each point, with its reason and source, is in [`decisions.md`](decisions.md). In
   must be a program-owned account (D15).
 - RFP-008 F11 asks for LLTV removal; M1 can only enable an LLTV. Admin scope is M2.
 
-## Open questions for Logos
+## Notes for M4
 
-1. [`decisions.md`](decisions.md#d5-and-f11-why-the-core-checks-staleness-and-how-to-choose-max_age_ms) proposes a
-   rule for choosing the maximum price age, `max_age_ms`, against the F11 stranded-collateral risk. Please review it,
-   and tell us how often each testnet price feed updates, so we can set defaults.
+Neither of these blocks M1.
+
+1. [`decisions.md`](decisions.md#d5-and-f11-why-the-core-checks-staleness-and-how-to-choose-max_age_ms) gives our
+   rule for choosing the maximum price age, `max_age_ms`, against the F11 stranded-collateral risk. We set per-feed
+   defaults in M4, once we know how often each testnet price feed updates.
 2. A TWAP feed gets a fresh timestamp on every publish, so the maximum-age check cannot see that the source behind
-   the TWAP has stopped. Could the price account carry the source's observation time?
+   the TWAP has stopped. It could if the price account carried the source's observation time.
