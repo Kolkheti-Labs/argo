@@ -37,7 +37,9 @@ cargo --version
 rustup show active-toolchain
 git rev-parse HEAD
 echo "== README steps =="
-cargo test -p argo_core -p irm_core
+cargo test -p argo_core -p irm_core -p argo_lending_core -p argo_lending_program
+RISC0_DEV_MODE=1 cargo test --locked --release -p argo_integration_tests
 ./harness/localnet.sh smoke
+./harness/localnet.sh e2e
 ./spikes/run.sh all
 echo "== CLEAN-HOST GREEN $(date -u +%FT%TZ) @ $(git rev-parse HEAD) =="

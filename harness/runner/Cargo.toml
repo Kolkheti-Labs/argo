@@ -13,6 +13,10 @@ name = "argo_deploy"
 path = "src/bin/argo_deploy.rs"
 
 [[bin]]
+name = "argo_m1_e2e"
+path = "src/bin/argo_m1_e2e.rs"
+
+[[bin]]
 name = "argo_initialize"
 path = "src/bin/argo_initialize.rs"
 
@@ -38,3 +42,8 @@ tokio.workspace = true
 anyhow.workspace = true
 hex.workspace = true
 borsh.workspace = true
+argo_core.workspace = true
+# lez-programs v2.0.1 types (same LEZ v0.2.4 and SPEL pins as Argo), for the M1 e2e run.
+lp_token_core = { git = "https://github.com/logos-blockchain/lez-programs.git", tag = "v2.0.1", package = "token_core" }
+sha2 = "0.10.9"
+serde.workspace = true

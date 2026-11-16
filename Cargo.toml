@@ -5,6 +5,7 @@ members = [
     "programs/argo_lending/core",
     "programs/argo_lending",
     "programs/argo_lending/methods",
+    "programs/argo_lending/integration_tests",
     "spikes/vault/core",
     "spikes/vault",
     "spikes/vault/methods",

@@ -19,6 +19,441 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "enable_lltv",
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "admin",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lltv",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "enable_irm",
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "admin",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "irm",
+          "type": "program_id"
+        }
+      ]
+    },
+    {
+      "name": "create_market",
+      "accounts": [
+        {
+          "name": "config",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "market",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "loan_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "collateral_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "dead_position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "loan_definition",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "collateral_definition",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "price_account",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "clock",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "creator_loan_holding",
+          "writable": true,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MarketParams"
+          }
+        },
+        {
+          "name": "oracle",
+          "type": {
+            "defined": "OracleDescriptor"
+          }
+        }
+      ]
+    },
+    {
+      "name": "supply",
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "loan_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "payer_holding",
+          "writable": true,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "clock",
+          "writable": false,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": "u128"
+        },
+        {
+          "name": "shares",
+          "type": "u128"
+        },
+        {
+          "name": "on_behalf",
+          "type": "account_id"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "loan_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "receiver_holding",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "caller",
+          "writable": false,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "clock",
+          "writable": false,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": "u128"
+        },
+        {
+          "name": "shares",
+          "type": "u128"
+        },
+        {
+          "name": "on_behalf",
+          "type": "account_id"
+        }
+      ]
+    },
+    {
+      "name": "supply_collateral",
+      "accounts": [
+        {
+          "name": "market",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "collateral_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "payer_holding",
+          "writable": true,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": "u128"
+        },
+        {
+          "name": "on_behalf",
+          "type": "account_id"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_collateral",
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "collateral_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "receiver_holding",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "caller",
+          "writable": false,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "price_account",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "clock",
+          "writable": false,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": "u128"
+        },
+        {
+          "name": "on_behalf",
+          "type": "account_id"
+        }
+      ]
+    },
+    {
+      "name": "borrow",
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "loan_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "receiver_holding",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "caller",
+          "writable": false,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "price_account",
+          "writable": false,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "clock",
+          "writable": false,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": "u128"
+        },
+        {
+          "name": "shares",
+          "type": "u128"
+        },
+        {
+          "name": "on_behalf",
+          "type": "account_id"
+        }
+      ]
+    },
+    {
+      "name": "repay",
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "loan_vault",
+          "writable": true,
+          "signer": false,
+          "init": false
+        },
+        {
+          "name": "payer_holding",
+          "writable": true,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "clock",
+          "writable": false,
+          "signer": false,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": "u128"
+        },
+        {
+          "name": "shares",
+          "type": "u128"
+        },
+        {
+          "name": "on_behalf",
+          "type": "account_id"
+        }
+      ]
     }
   ],
   "instruction_type": "argo_lending_core::Instruction"

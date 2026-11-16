@@ -6,6 +6,8 @@
 #   ./harness/localnet.sh down    stop it
 #   ./harness/localnet.sh smoke   build + up + deploy argo_lending + initialize Config
 #                                 + read it back over JSON-RPC, then down. Exit 0 = green.
+#   ./harness/localnet.sh e2e     M1 done gate: build + up + argo_m1_e2e (pinned token and
+#                                 twap_oracle, all six operations, over-LLTV borrow dropped), then down.
 #
 # Never touches testnet.lez.logos.co. Honours CARGO_TARGET_DIR and RISC0_DEV_MODE
 # (default 1). Assumes a minimal container: curl + python3 only, no ss/pkill.
@@ -126,10 +128,19 @@ print("config program_owner =", r["program_owner"], "data bytes =", len(r["data"
   echo "=== ARGO LOCALNET SMOKE GREEN (program $PROGRAM_ID) ==="
 }
 
+cmd_e2e() {
+  trap cmd_down EXIT
+  cmd_build
+  cmd_up
+  echo "=== argo_m1_e2e ==="
+  ARGO_SEQ_LOG="$D/seq.log" "$TARGET/release/argo_m1_e2e" || die "M1 e2e failed"
+}
+
 case "${1:-}" in
   build) cmd_build ;;
   up) cmd_up ;;
   down) cmd_down ;;
   smoke) cmd_smoke ;;
-  *) echo "usage: $0 {build|up|down|smoke}" >&2; exit 2 ;;
+  e2e) cmd_e2e ;;
+  *) echo "usage: $0 {build|up|down|smoke|e2e}" >&2; exit 2 ;;
 esac

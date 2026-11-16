@@ -11,12 +11,39 @@ Third-party / upstream code
 Vendored files:
   * tools/idl-gen/src/main.rs — from logos-blockchain/lez-programs
     (tools/idl-gen/src/main.rs, Copyright (c) 2026 Logos Blockchain, commit 6956b23), MIT.
+  * vendor/lez-programs-v2.0.1/token.bin and twap_oracle.bin — compiled guests of
+    logos-blockchain/lez-programs tag v2.0.1 (commit b17f919), Copyright (c) 2026 Logos
+    Blockchain, MIT. Provenance, image ids and hashes: vendor/lez-programs-v2.0.1/README.md.
+  * programs/argo_lending/core/src/external.rs — type definitions copied from
+    logos-blockchain/lez-programs v2.0.1 (programs/token/core/src/lib.rs: Instruction
+    variant order, TokenDefinition, TokenHolding; programs/twap_oracle/core/src/lib.rs:
+    OraclePriceAccount), Copyright (c) 2026 Logos Blockchain, MIT; and from
+    logos-blockchain/logos-execution-zone v0.2.4 (lez/programs/clock/core/src/lib.rs:
+    ClockAccountData, the CLOCK_01 id), Copyright (c) 2025 Vac, MIT.
+  * harness/runner/src/bin/argo_m1_e2e.rs — mirrors twap_oracle_core::Instruction (variant
+    order) and compute_oracle_price_account_pda from lez-programs v2.0.1, MIT (as above).
 
-Otherwise no upstream source is vendored into this repository. Argo depends on
-the SPEL framework (logos-co/spel, MIT) and the Logos Execution Zone
-(logos-blockchain/logos-execution-zone, MIT, Copyright (c) 2025 Vac) as Cargo
-dependencies only. logos-blockchain/lez-programs (MIT) is used as the layout
-and pattern reference for SPEL programs.
+MIT licence text for the lez-programs and LEZ material above:
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  software and associated documentation files (the "Software"), to deal in the Software
+  without restriction, including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+  to whom the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies or
+  substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+  PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+  FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  DEALINGS IN THE SOFTWARE.
+
+Argo also depends on the SPEL framework (logos-co/spel, MIT), the Logos Execution Zone
+(logos-blockchain/logos-execution-zone, MIT, Copyright (c) 2025 Vac) and, in tests and the
+harness only, lez-programs v2.0.1 token_core (MIT) as Cargo dependencies.
 When any upstream file is copied into this tree, list it here with its origin
 commit and licence.
 

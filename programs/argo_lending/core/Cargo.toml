@@ -3,7 +3,7 @@ name = "argo_lending_core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Argo lending program: Instruction enum, account layouts, PDA seeds (M0 placeholder)"
+description = "Argo lending program: Instruction enum, account layouts, market/oracle ids, PDA seeds, vendored external types"
 
 [lints]
 workspace = true
@@ -13,3 +13,10 @@ lee_core.workspace = true
 argo_core.workspace = true
 serde.workspace = true
 borsh.workspace = true
+sha2 = { version = "0.10.9", default-features = false }
+
+[dev-dependencies]
+hex.workspace = true
+risc0-zkvm.workspace = true
+token_core.workspace = true
+lp_token_core = { git = "https://github.com/logos-blockchain/lez-programs.git", tag = "v2.0.1", package = "token_core" }
