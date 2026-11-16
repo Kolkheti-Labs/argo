@@ -1,10 +1,9 @@
 # M1: core market primitives
 
-**Part 1 of M1, on branch `m1`.** Part 2 comes from adp and lands on the same branch. We submit M1 for
-acceptance on [logos-co/rfp issue 171](https://github.com/logos-co/rfp/issues/171) once both parts are in, and
-the submission will name the exact commit to review.
+Submitted for acceptance on [logos-co/rfp issue 171](https://github.com/logos-co/rfp/issues/171). The
+submission names the exact commit to review.
 
-Part 1 is Argo's lending program on LEZ v0.2.4: one program that holds every market, permissionless market
+M1 is Argo's lending program on LEZ v0.2.4: one program that holds every market, permissionless market
 creation, and the six core operations (`supply`, `withdraw`, `supply_collateral`, `withdraw_collateral`,
 `borrow`, `repay`). Tokens move by chained calls to the lez-programs v2.0.1 token program, a health check caps
 borrowing and collateral withdrawals, and supply and debt are tracked in virtual shares. Nothing is deployed. It

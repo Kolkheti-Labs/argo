@@ -8,7 +8,7 @@ calls.
 
 Built by Kolkheti Labs under Logos RFP-008
 (https://github.com/logos-co/rfp/issues/141). Status: **M1, core market
-primitives: part 1 done on branch `m1`, part 2 (adp) to follow**, see
+primitives: done on branch `m1`**, see
 `docs/m1/README.md` (tracker: https://github.com/logos-co/rfp/issues/171;
 M0: https://github.com/logos-co/rfp/issues/170, code merged to `main` in PR #1). Nothing here is
 deployed and nothing custodies value. The M1 build pins a public test admin key
